@@ -185,8 +185,8 @@ class Node:
         """
         for (dist, node) in self.neighbor_distance_list:
             if dist <= self.tx_range:
-                if pck['dest'].is_equal(BROADCAST_ADDR) or pck['dest'].is_equal(node.addr):
-                    prop_time = dist / 1000000 - 0.00001
+                if pck['dest'].is_equal(BROADCAST_ADDR) or (node.addr is not None and pck['dest'].is_equal(node.addr)):
+                    prop_time = dist / 1000000 - 0.00001 if dist / 1000000 - 0.00001 >0 else 0.00001
                     self.delayed_exec(prop_time, node.on_receive_check, pck)
             else:
                 break
@@ -414,7 +414,7 @@ class Simulator:
         start_delayed(self.env, func, delay=delay)
 
     ############################
-    def add_node(self, node_class, pos, *args, **kwargs):
+    def add_node(self, node_class, pos):
         """Adds a new node in to network.
 
            Args:
