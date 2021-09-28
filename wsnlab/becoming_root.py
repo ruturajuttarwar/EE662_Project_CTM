@@ -67,6 +67,7 @@ sim = wsn.Simulator(
     # Connected nodes will be green.
     # Routers/Cluster Heads should be blue  
     # Thanks Mustafa
+    # This ghazaleh
 
 
     until=100, # simulation Duration in seconds
