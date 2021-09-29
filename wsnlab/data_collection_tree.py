@@ -36,6 +36,7 @@ class SensorNode(wsn.Node):
         self.scene.nodecolor(self.id, 1, 1, 1) # sets self color to white
         self.sleep()
         self.addr = None
+        self.ch_addr = None
         self.role = Roles.UNDISCOVERED
         self.is_root_eligible = True if self.id == 45 else False
         self.c_probe = 0  # c means counter and probe is the name of counter

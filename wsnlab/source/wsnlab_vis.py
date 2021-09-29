@@ -88,8 +88,8 @@ class Node(wsnlab.Node):
                 if node.ch_addr is not None and node.ch_addr.is_equal(dest):
                     self.scene.addlink(node.id, self.id, "parent")
                     break
-                else:
-                    break
+            else:
+                break
 
 
 ###########################################################
