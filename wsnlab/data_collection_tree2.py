@@ -37,7 +37,7 @@ class SensorNode(wsn.Node):
         self.sleep()
         self.addr = None
         self.ch_addr = None
-        self.parent_addr = None
+        self.parent_gui = None
         self.root_addr = None
         self.role = Roles.UNDISCOVERED
         self.is_root_eligible = True if self.id == ROOT_ID else False
@@ -68,6 +68,24 @@ class SensorNode(wsn.Node):
         if pck['gui'] not in self.child_networks_table.keys() or pck['gui'] not in self.members_table:
             if pck['gui'] not in self.candidate_parents_table:
                 self.candidate_parents_table.append(pck['gui'])
+
+    ###################
+    def check_neighbors(self):
+        childs_updated = False
+        parent_dead = False
+        for gui, pck in self.neighbors_table.items():
+            if self.now - pck['arrival_time'] > 3 * config.HEARTH_BEAT_TIME_INTERVAL:
+                del self.neighbors_table[gui]
+                if gui == self.parent_gui:
+                    parent_dead = True
+                elif gui in self.child_networks_table.keys():
+                    del self.child_networks_table[gui]
+                    childs_updated = True
+        if parent_dead:
+            pass
+        elif childs_updated:
+            self.send_network_update()
+
 
     ###################
     def send_probe(self):
@@ -117,7 +135,8 @@ class SensorNode(wsn.Node):
 
         """
         self.send({'dest': wsn.BROADCAST_ADDR, 'type': 'JOIN_REPLY', 'source': self.ch_addr,
-                   'gui': gui, 'addr': addr, 'root_addr': self.root_addr, 'hop_count': self.hop_count+1})
+                   'gui': self.id, 'dest_gui': gui, 'addr': addr, 'root_addr': self.root_addr,
+                   'hop_count': self.hop_count+1})
 
     ###################
     def send_join_ack(self, dest):
@@ -140,7 +159,8 @@ class SensorNode(wsn.Node):
         Returns:
 
         """
-        pck['next_hop'] = self.parent_addr
+        if self.role != Roles.ROOT:
+            pck['next_hop'] = self.neighbors_table[self.parent_gui]['ch_addr']
         if self.ch_addr is not None:
             if pck['dest'].net_addr == self.ch_addr.net_addr:
                 pck['next_hop'] = pck['dest']
@@ -189,7 +209,7 @@ class SensorNode(wsn.Node):
         for networks in self.child_networks_table.values():
             child_networks.extend(networks)
 
-        self.send({'dest': self.parent_addr, 'type': 'NETWORK_UPDATE', 'source': self.addr,
+        self.send({'dest': self.neighbors_table[self.parent_gui]['ch_addr'], 'type': 'NETWORK_UPDATE', 'source': self.addr,
                    'gui': self.id, 'child_networks': child_networks})
 
     ###################
@@ -224,7 +244,6 @@ class SensorNode(wsn.Node):
                 self.child_networks_table[pck['gui']] = pck['child_networks']
                 if self.role != Roles.ROOT:
                     self.send_network_update()
-                self.log(self.child_networks_table)
             if pck['type'] == 'SENSOR':
                 pass
                 # self.log(str(pck['source'])+'--'+str(pck['sensor_value']))
@@ -244,6 +263,8 @@ class SensorNode(wsn.Node):
                 self.scene.nodecolor(self.id, 0, 0, 1)
                 self.ch_addr = pck['addr']
                 self.send_network_update()
+                yield self.timeout(.5)
+                self.send_heart_beat()
                 for gui in self.received_JR_guis:
                     yield self.timeout(random.uniform(.1,.5))
                     self.send_join_reply(gui, wsn.Addr(self.ch_addr.net_addr,gui))
@@ -262,11 +283,11 @@ class SensorNode(wsn.Node):
             if pck['type'] == 'HEART_BEAT':
                 self.update_neighbor(pck)
             if pck['type'] == 'JOIN_REPLY':  # it becomes registered and sends join ack if the message is sent to itself once received join reply
-                if pck['gui'] == self.id:
+                if pck['dest_gui'] == self.id:
                     self.addr = pck['addr']
                     self.role = Roles.REGISTERED
                     self.scene.nodecolor(self.id, 0, 1, 0)
-                    self.parent_addr = pck['source']
+                    self.parent_gui = pck['gui']
                     self.root_addr = pck['root_addr']
                     self.hop_count = pck['hop_count']
                     self.draw_parent(pck['source'])
@@ -316,6 +337,7 @@ class SensorNode(wsn.Node):
                     self.set_timer('TIMER_PROBE', 30)
 
         elif name == 'TIMER_HEART_BEAT':  # it sends heart beat message once heart beat timer fired
+            self.check_neighbors()
             self.send_heart_beat()
             self.set_timer('TIMER_HEART_BEAT', config.HEARTH_BEAT_TIME_INTERVAL)
 
