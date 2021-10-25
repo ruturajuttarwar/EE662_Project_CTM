@@ -2,7 +2,7 @@ import random
 from enum import Enum
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '..\source')
+sys.path.insert(1, '.\source\\')
 from source import wsnlab_vis as wsn
 import math
 from source import config
@@ -269,7 +269,8 @@ class SensorNode(wsn.Node):
                     self.parent_addr = pck['source']
                     self.root_addr = pck['root_addr']
                     self.hop_count = pck['hop_count']
-                    self.draw_parent(pck['source'])
+                    
+                    self.draw_parent(pck['source'])  
                     self.kill_timer('TIMER_JOIN_REQUEST')
                     yield self.timeout(.5)
                     self.send_heart_beat()

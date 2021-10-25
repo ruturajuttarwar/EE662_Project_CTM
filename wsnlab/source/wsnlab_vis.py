@@ -2,7 +2,7 @@
 """
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '..')
+sys.path.insert(1, '.')
 from wsnlab.source import wsnlab
 from wsnlab.source.wsnlab import *
 from threading import Thread
