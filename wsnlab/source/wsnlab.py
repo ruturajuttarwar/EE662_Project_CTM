@@ -7,9 +7,7 @@ import inspect
 import random
 import simpy
 from simpy.util import start_delayed
-import sys
-sys.path.insert(1, '..')
-from wsnlab.source import config
+from source import config
 
 ###########################################################
 class Addr:

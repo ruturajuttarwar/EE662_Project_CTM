@@ -2,7 +2,7 @@ import random
 from enum import Enum
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '..\source')
+sys.path.insert(1, '.')
 from source import wsnlab_vis as wsn
 import math
 from source import config
@@ -124,6 +124,18 @@ class SensorNode(wsn.Node):
             if childs_updated:
                 if self.role != Roles.ROOT:
                     self.send_network_update()
+
+    ###################
+    def select_and_join(self):
+        min_hop = 99999
+        min_hop_gui = 99999
+        for gui in self.candidate_parents_table:
+            if self.neighbors_table[gui]['hop_count'] < min_hop or (self.neighbors_table[gui]['hop_count'] == min_hop and gui < min_hop_gui):
+                min_hop = self.neighbors_table[gui]['hop_count']
+                min_hop_gui = gui
+        selected_addr = self.neighbors_table[min_hop_gui]['source']
+        self.send_join_request(selected_addr)
+        self.set_timer('TIMER_JOIN_REQUEST', 5)
 
 
     ###################
@@ -404,15 +416,7 @@ class SensorNode(wsn.Node):
                 self.send_probe()
                 self.set_timer('TIMER_JOIN_REQUEST', 20)
             else:  # otherwise it chose one of them and sends join request
-                min_hop = 99999
-                min_hop_gui = 99999
-                for gui in self.candidate_parents_table:
-                    if self.neighbors_table[gui]['hop_count'] < min_hop or (self.neighbors_table[gui]['hop_count'] == min_hop and gui < min_hop_gui):
-                        min_hop = self.neighbors_table[gui]['hop_count']
-                        min_hop_gui = gui
-                selected_addr = self.neighbors_table[min_hop_gui]['source']
-                self.send_join_request(selected_addr)
-                self.set_timer('TIMER_JOIN_REQUEST', 5)
+                self.select_and_join()
 
         elif name == 'TIMER_SENSOR':
             self.route_and_forward_package({'dest': self.root_addr, 'type': 'SENSOR', 'source': self.addr, 'sensor_value': random.uniform(10,50)})

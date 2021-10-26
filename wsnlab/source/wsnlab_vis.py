@@ -1,13 +1,10 @@
 """Visualisation of wsnlab library. Based on wsnsimpy_tk. Used package instead of message by Mustafa Tosun.
 """
-import sys
-# insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '.')
-from wsnlab.source import wsnlab
-from wsnlab.source.wsnlab import *
+from source import wsnlab
+from source.wsnlab import *
 from threading import Thread
-from wsnlab.topovis import Scene
-from wsnlab.topovis.TkPlotter import Plotter
+from topovis import Scene
+from topovis.TkPlotter import Plotter
 
 
 class Node(wsnlab.Node):
