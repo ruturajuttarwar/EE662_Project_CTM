@@ -34,7 +34,7 @@ class Plotter(GenericPlotter):
             tx,ty = 700,700
         self.tk = Tk()
         self.tk.title(self.windowTitle)
-        self.canvas = Canvas(self.tk, width=tx, height=ty)
+        self.canvas = Canvas(self.tk, width=tx, height=ty, bg='white')
         self.canvas.pack(fill=BOTH, expand=YES)
         self.timeText = self.canvas.create_text(0,0,text="time=0.0",anchor=NW)
 

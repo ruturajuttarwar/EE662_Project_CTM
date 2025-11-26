@@ -1,0 +1,4 @@
+node_id,node_role,child_count,children
+6,ROOT,1,"16(ROUTER)[6,26,26,28,28,8]"
+26,CLUSTER_HEAD,1,"27(ROUTER)[26,28,28,8]"
+28,CLUSTER_HEAD,1,"18(ROUTER)[28,8]"
