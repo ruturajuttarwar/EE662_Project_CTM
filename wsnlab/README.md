@@ -1,8 +1,8 @@
-# Wireless Sensor Network (WSN) Simulation
+# Hierarchical Wireless Sensor Network with Router Layer
 
 ## Overview
 
-This is a **Data Collection Tree (DCT)** simulation for a Wireless Sensor Network with **CTM-AdHoc Hybrid Routing**. The simulation models how 100 sensor nodes form a hierarchical network structure with cluster heads, register to the network, and route data using multiple routing strategies.
+This is a **Data Collection Tree (DCT)** simulation for a Wireless Sensor Network with **Router Layer** and **CTM-AdHoc Hybrid Routing**. The simulation models how 100 sensor nodes self-organize into a hierarchical network structure where distant cluster heads are connected through automatically promoted router nodes, enabling multi-hop network coverage beyond single-hop range.
 
 ---
 
@@ -11,13 +11,16 @@ This is a **Data Collection Tree (DCT)** simulation for a Wireless Sensor Networ
 ### Network Formation
 1. **Node Startup** - All 100 nodes appear on the visualization panel, then wake up after a startup delay
 2. **Root Election** - One node becomes the ROOT (network coordinator)
-3. **Cluster Head Formation** - Nodes that can't find a parent become Cluster Heads (CHs)
-4. **Node Registration** - Nodes join CHs to form clusters
-5. **Tree Structure** - CHs register to ROOT, forming a hierarchical tree
+3. **Initial Cluster Formation** - Nodes near ROOT join as REGISTERED (green)
+4. **Router Promotion** - Distant yellow nodes trigger router nomination from nearby greens
+5. **Router Selection** - Parent CH selects closest green as ROUTER based on distance
+6. **CH Creation** - ROUTER promotes yellow to CLUSTER_HEAD, extending network reach
+7. **Hierarchical Tree** - Process repeats, forming ROOT→ROUTER→CH→REGISTERED hierarchy
 
 ### Network Roles
 - **ROOT** (Black) - Network coordinator, root of the tree
 - **CLUSTER_HEAD** (Blue) - Cluster coordinators, manage member nodes
+- **ROUTER** (Orange) - Bridge nodes connecting distant cluster heads
 - **REGISTERED** (Green) - Nodes successfully joined a cluster
 - **UNREGISTERED** (Yellow) - Nodes searching for a network
 - **UNDISCOVERED** (White) - Nodes not yet awake
@@ -39,11 +42,13 @@ This is a **Data Collection Tree (DCT)** simulation for a Wireless Sensor Networ
 - **Join Retry Logic** - Nodes keep trying to join before becoming CHs
 - **Router Layer** - Edge nodes become routers to bridge clusters (prevents overlap)
 
-### Router-Based Cluster Expansion (NEW!)
-- **Edge Node Detection** - Identifies nodes at cluster boundaries
-- **Router Promotion** - Edge nodes become routers instead of CHs
-- **Cluster Bridging** - Routers connect two clusters (purple nodes)
-- **Overlap Prevention** - No CH forms inside another CH's range
+### Router Layer Implementation
+- **Automatic Router Nomination** - Green nodes nominate themselves when yellow broadcasts JOIN_REQUEST
+- **Distance-Based Selection** - Parent CH selects closest green as router (prevents overlap)
+- **Competitive Nomination** - Multiple greens compete, best one wins based on distance
+- **Router Promotion Flow** - Green→ROUTER→requests CH promotion for yellow→Yellow becomes CH
+- **Lock Management** - Parent CH locks during promotion, unlocks on completion message
+- **Multi-Hop Extension** - Enables cluster heads beyond single-hop range of ROOT
 
 ### Network Optimization
 - **Multi-Hop Neighbor Discovery** - Nodes learn about 2-hop neighbors
@@ -74,10 +79,10 @@ YELLOW_NODE_CH_TIMEOUT = 120            # Seconds before becoming CH
 YELLOW_NODE_CH_TIMEOUT_VARIANCE = 60    # Random variance
 MIN_CH_DISTANCE = 60                    # Minimum distance between CHs
 
-# Router Layer (NEW!)
+# Router Layer
 ENABLE_ROUTER_LAYER = True              # Enable router-based cluster expansion
-ROUTER_HB_INTERVAL = 60                 # Router heartbeat interval
-ROUTER_PROMOTION_DISTANCE = 90          # % of TX range for edge detection
+ROUTER_HEARTBEAT_INTERVAL = 60          # Router heartbeat interval
+MIN_CLUSTER_SIZE = 3                    # Minimum nodes per cluster before CH promotion
 
 # Routing
 ENABLE_HYBRID_ROUTING = True            # CTM-AdHoc hybrid routing
@@ -89,6 +94,7 @@ NEIGHBOR_TIMEOUT = 30                   # Remove stale neighbors after 30s
 
 ## Running the Simulation
 
+### Main Simulation
 ```bash
 cd wsnlab
 python3 data_collection_tree.py
@@ -98,8 +104,15 @@ The simulation will:
 1. Create 100 nodes at random positions
 2. Display them on the visualization panel
 3. Wait 5 seconds for all nodes to appear
-4. Start network formation
-5. Export CSV files when complete or when you press Ctrl+C
+4. Start network formation with router layer
+5. Show real-time color changes (white→yellow→green→blue/orange)
+6. Export CSV files when complete or when you press Ctrl+C
+
+### Read Statistics
+```bash
+python3 read_stats.py
+```
+Analyzes exported CSV files and displays network statistics
 
 ---
 
@@ -162,12 +175,12 @@ Isolated        :   0 nodes
 
 ### With Router Layer (ENABLE_ROUTER_LAYER = True)
 ```
-CLUSTER_HEAD    :  5-8 nodes
-ROUTER          :  2-4 nodes (purple)
-REGISTERED      :  87-93 nodes
-ROOT            :   1 node
+CLUSTER_HEAD    :  5-8 nodes (blue)
+ROUTER          :  2-4 nodes (orange)
+REGISTERED      :  87-93 nodes (green)
+ROOT            :   1 node (black)
 Isolated        :   0 nodes
-Overlapping CHs :   0 (prevented!)
+Network Depth   :   3-4 hops (ROOT→ROUTER→CH→REGISTERED)
 ```
 
 ### CSV File Sizes
@@ -267,10 +280,14 @@ print(messages['message_type'].value_counts())
 
 ```
 wsnlab/
-├── data_collection_tree.py      # Main simulation
+├── data_collection_tree.py      # Main simulation with router layer
+├── read_stats.py                # Statistics analyzer
 ├── source/
 │   ├── config.py                # Configuration parameters
 │   └── wsnlab_vis.py            # Visualization library
+├── topovis/                     # Visualization components
+│   ├── TopoVis.py               # Topology visualization
+│   └── TkPlotter.py             # Tkinter plotting
 ├── README.md                     # This file
 ├── neighbors_table.csv           # Generated: neighbor tables
 ├── members_table.csv             # Generated: cluster members
@@ -284,23 +301,36 @@ wsnlab/
 
 ## Key Algorithms
 
-### Network Formation
+### Router Layer Algorithm
+1. **Yellow Detection** - Unregistered node (yellow) broadcasts JOIN_REQUEST
+2. **Router Nomination** - Nearby green nodes receive request, nominate themselves with distance
+3. **Nomination Collection** - Parent CH collects nominations for 2 seconds
+4. **Router Selection** - CH selects closest green as router (distance-based)
+5. **Router Approval** - Selected green receives ROUTER_APPROVAL, others get ROUTER_REJECTION
+6. **CH Promotion Request** - Router sends NETWORK_REQUEST to ROOT for yellow's CH address
+7. **ROOT Approval** - ROOT allocates CH address, sends NETWORK_REPLY to router
+8. **BECOME_CH Message** - Router sends BECOME_CH to yellow with new CH address
+9. **Yellow→CH** - Yellow becomes CLUSTER_HEAD (blue), router becomes ROUTER (orange)
+10. **Lock Release** - New CH sends ROUTER_PROMOTION_COMPLETE to unlock parent CH
+11. **Next Yellow** - Parent CH processes next yellow in queue
+
+### Network Formation (Without Router Layer)
 1. ROOT sends HEART_BEAT
 2. Yellow nodes receive HEART_BEAT, send JOIN_REQUEST
 3. CH/ROOT sends JOIN_REPLY with address
 4. Node sends JOIN_ACK, becomes REGISTERED
 
-### Routing Decision
+### Routing Decision (CTM-AdHoc Hybrid)
 1. Check if destination is a direct neighbor → Direct mesh
 2. Check if destination is a cluster member → Intra-cluster
 3. Check if destination is in child networks → Downward tree
 4. Check multi-hop neighbors → Multi-hop route
 5. Forward to parent → Upward tree
 
-### CH Promotion
+### Adaptive CH Promotion (Fallback)
 1. Node becomes UNREGISTERED (yellow)
-2. Waits 120-180 seconds for CH heartbeat
-3. If no CH found, becomes CLUSTER_HEAD (blue)
+2. Waits 60-90 seconds for CH heartbeat or router promotion
+3. If no response, becomes CLUSTER_HEAD (blue)
 4. Sends HEART_BEAT to attract members
 
 ---
@@ -330,13 +360,63 @@ wsnlab/
 
 ---
 
+## Technical Implementation
+
+### Core Components
+- **SensorNode Class** - Main node implementation with role-based behavior
+- **Router Nomination System** - Competitive selection of router nodes
+- **Lock Management** - Prevents race conditions during promotions
+- **Event-Based Completion** - ROUTER_PROMOTION_COMPLETE message unlocks parent
+- **Mesh Routing** - route_and_forward_package() handles multi-hop delivery
+- **Neighbor Management** - Heartbeat protocol with timeout-based cleanup
+
+### Message Types
+- `PROBE` - Network discovery
+- `HEART_BEAT` - Neighbor maintenance
+- `JOIN_REQUEST` - Cluster membership request (triggers router nomination)
+- `ROUTER_NOMINATION` - Green nominates self for router role
+- `ROUTER_APPROVAL/REJECTION` - CH's router selection decision
+- `NETWORK_REQUEST/REPLY` - CH address allocation from ROOT
+- `BECOME_CH` - Router promotes yellow to CH
+- `ROUTER_PROMOTION_COMPLETE` - Unlock parent CH after promotion
+- `ROUTER_REGISTER` - Router registers with parent CH
+
+### Key Features
+- **Distance-Based Selection** - Euclidean distance calculation for optimal router
+- **Time-Based Locking** - Only one yellow promoted at a time per CH
+- **Deterministic Seeding** - Reproducible network topology (NETWORK_SEED = 42)
+- **Real-Time Visualization** - Color-coded nodes show role changes
+- **Comprehensive Logging** - Detailed logs for debugging and analysis
+
+---
+
 ## Summary
 
 This simulation demonstrates:
-✓ Hierarchical network formation  
-✓ Cluster-based organization  
-✓ Hybrid routing strategies  
-✓ Adaptive timeout mechanisms  
+✓ Hierarchical network formation with router layer  
+✓ Automatic router promotion for multi-hop coverage  
+✓ Distance-based competitive router selection  
+✓ Cluster-based organization with adaptive management  
+✓ Hybrid CTM-AdHoc routing strategies  
+✓ Event-driven lock management for race condition prevention  
 ✓ Multi-hop neighbor discovery  
+✓ Self-organizing network topology  
 
 All with **clean, merged CSV outputs** for easy analysis!
+
+---
+
+## Research & Academic Use
+
+This project demonstrates advanced WSN concepts:
+- Self-organizing hierarchical networks
+- Dynamic router layer for scalability
+- Hybrid routing protocol design
+- Distributed coordination algorithms
+- Event-driven network protocols
+
+Suitable for:
+- Wireless sensor network research
+- Network protocol development
+- Distributed systems education
+- IoT architecture studies
