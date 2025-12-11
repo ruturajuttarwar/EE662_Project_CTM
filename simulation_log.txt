@@ -1,0 +1,19 @@
+================================================================================
+SIMULATION LOG - V2
+================================================================================
+Starting simulation...
+Duration: 5000s, Nodes: 100
+Log file: simulation_log.txt
+================================================================================
+Node #82 [  46.29110] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #71 [  46.29110] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #72 [  46.29113] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #80 [  46.29113] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #70 [  46.29114] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #81 [  46.29124] Member joined: 82, cluster size: 1
+Node #81 [  46.29126] Member joined: 71, cluster size: 2
+Node #81 [  46.29137] Member joined: 72, cluster size: 3
+Node #81 [  46.29137] Member joined: 80, cluster size: 4
+Node #81 [  46.29139] Member joined: 70, cluster size: 5
+Node #92 [  76.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [  76.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination

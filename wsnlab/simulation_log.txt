@@ -1,0 +1,94 @@
+================================================================================
+SIMULATION LOG - V2
+================================================================================
+Starting simulation...
+Duration: 5000s, Nodes: 100
+Log file: simulation_log.txt
+================================================================================
+Node #82 [  46.29110] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #71 [  46.29110] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #72 [  46.29113] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #80 [  46.29113] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #70 [  46.29114] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #81 [  46.29124] Member joined: 82, cluster size: 1
+Node #81 [  46.29126] Member joined: 71, cluster size: 2
+Node #81 [  46.29137] Member joined: 72, cluster size: 3
+Node #81 [  46.29137] Member joined: 80, cluster size: 4
+Node #81 [  46.29139] Member joined: 70, cluster size: 5
+Node #92 [  76.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [  76.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [  76.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [  91.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [  91.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [  91.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 106.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 106.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 106.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 121.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 121.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 121.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 136.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 136.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 136.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 151.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 151.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 151.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 166.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 166.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 166.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 181.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 181.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 181.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 196.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 196.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 196.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 211.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 211.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 211.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 226.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 226.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 226.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 241.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 241.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 241.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 256.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 256.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 256.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 271.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 271.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 271.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 286.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 286.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 286.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 301.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 301.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 301.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 316.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 316.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 316.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 331.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 331.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 331.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 346.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 346.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 346.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 361.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 361.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 361.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 376.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 376.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 376.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 391.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 391.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 391.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+Node #92 [ 406.29130] [JOIN] Selecting REGISTERED 82 (hop=1) - will trigger router nomination
+Node #73 [ 406.29130] [JOIN] Selecting REGISTERED 72 (hop=1) - will trigger router nomination
+Node #90 [ 406.29137] [JOIN] Selecting REGISTERED 80 (hop=1) - will trigger router nomination
+
+
+⚠️  Simulation stopped by user (Ctrl+C)
+
+✓ Simulation completed!
+
+
+⚠️  Simulation stopped by user (Ctrl+C)

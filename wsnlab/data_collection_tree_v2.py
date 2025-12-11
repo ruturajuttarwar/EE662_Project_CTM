@@ -104,13 +104,15 @@ class SensorNode(wsn.Node):
         self.router_links = {}
         self.adaptive_ch_timeout = self._calculate_adaptive_ch_timeout()
         
-        # Router Nomination System
+        # Router Nomination System - V2: Boolean Lock
         self.pending_nominations = {}
         self.nomination_timers = {}
-        self.active_router_promotion = None
-        self.active_router_green = None  # Track which green is being promoted to router
-        self.waiting_for_router_promotion = False  # Yellow: waiting for BECOME_CH
+        self.router_promotion_in_progress = False  # Boolean lock instead of yellow-specific
+        self.current_yellow_being_promoted = None  # Track which yellow (for logging/verification)
         self.cancelled_promotions = set()  # Track cancelled promotions (for greens)
+        self.processing_nominations = False  # Yellow: prevent duplicate processing
+        self.router_requests_sent = set()  # Track which yellows we've sent NETWORK_REQUEST for (deduplication)
+        self.prefer_ch_join = False  # Yellow: prefer CH over REGISTERED after router promotion reset
         
         # Multi-Hop Neighbor Discovery
         self.multihop_neighbors = {}  # 2-hop and beyond neighbors
@@ -247,7 +249,11 @@ class SensorNode(wsn.Node):
 
 
     def select_and_join(self):
-        """Join logic - prefer REGISTERED/ROUTER nodes to trigger router nomination"""
+        """Join logic - prefer CH if flag set, otherwise prefer REGISTERED for router nomination"""
+        # FIX: Prevent sending multiple JOIN_REQUEST - check if already sent
+        if self.addr is not None:
+            return  # Already joined, don't send again
+        
         # Safety check: if no candidates, shouldn't be called
         if len(self.candidate_parents_table) == 0:
             self.log(f"[JOIN] select_and_join called with no candidates - waiting for responses")
@@ -267,7 +273,27 @@ class SensorNode(wsn.Node):
                 elif role in [Roles.CLUSTER_HEAD, Roles.ROOT]:
                     ch_candidates.append(gui)
         
-        # Try REGISTERED nodes first ( router nomination)
+        # FIX: If prefer_ch_join flag is set, try CH first (after router promotion reset)
+        if self.prefer_ch_join and ch_candidates:
+            self.log(f"[JOIN] Prefer CH flag set - selecting CH over greens")
+            min_hop = 99999
+            min_hop_gui = None
+            for gui in ch_candidates:
+                if gui in self.neighbors_table:
+                    hop = self.neighbors_table[gui]['hop_count']
+                    if hop < min_hop or (hop == min_hop and (min_hop_gui is None or gui < min_hop_gui)):
+                        min_hop = hop
+                        min_hop_gui = gui
+            
+            if min_hop_gui is not None:
+                selected_addr = self.neighbors_table[min_hop_gui]['source']
+                self.log(f"[JOIN] Selecting CLUSTER_HEAD {min_hop_gui} (hop={min_hop}) - direct join")
+                self.send_join_request(selected_addr)
+                self.prefer_ch_join = False  # Reset flag after using
+                self.set_timer('TIMER_JOIN_REQUEST', 15)
+                return
+        
+        # Try REGISTERED nodes first (router nomination)
         if registered_candidates:
             min_hop = 99999
             min_hop_gui = None
@@ -279,10 +305,9 @@ class SensorNode(wsn.Node):
                         min_hop_gui = gui
             
             if min_hop_gui is not None:
-                selected_addr = self.neighbors_table[min_hop_gui]['source']
+                # FIX: Broadcast for router nomination (so all greens can respond)
                 self.log(f"[JOIN] Selecting REGISTERED {min_hop_gui} (hop={min_hop}) - will trigger router nomination")
-                self.send_join_request(selected_addr)
-                self.waiting_for_router_promotion = True  # Mark as waiting
+                self.send_join_request(wsn.BROADCAST_ADDR)  # Broadcast for router nomination
                 self.set_timer('TIMER_JOIN_REQUEST', 15)
                 return
         
@@ -321,7 +346,7 @@ class SensorNode(wsn.Node):
                 self.log(f"[JOIN] Selecting {role.name} {min_hop_gui} (hop={min_hop}) - no greens available")
                 self.send_join_request(selected_addr)
                 self.set_timer('TIMER_JOIN_REQUEST', 15)
-                return
+        return
         
         # No valid candidates in neighbor table yet
         self.log(f"[JOIN] Candidates in table but not in neighbors yet - waiting for next cycle")
@@ -400,16 +425,16 @@ class SensorNode(wsn.Node):
     def send_join_request(self, dest):
         """Sending join request message to join destination network
         
-        ROUTER LOGIC: Broadcasts JOIN_REQUEST so multiple greens can receive it,
-         CH selects closest green based on distance.
+        FIX: Use direct send when joining CH/ROOT (dest provided).
+        Only broadcast when triggering router nomination (dest is BROADCAST_ADDR).
 
         Args:
-            dest (Addr): Address of destination node (ignored, using broadcast)
+            dest (Addr): Address of destination node (use this, don't always broadcast!)
         Returns:
 
         """
-        # Broadcast so ALL greens
-        self.send({'dest': wsn.BROADCAST_ADDR, 'type': 'JOIN_REQUEST', 'gui': self.id})
+        # FIX: Use dest parameter - direct send to CH/ROOT, or broadcast for router nomination
+        self.send({'dest': dest, 'type': 'JOIN_REQUEST', 'gui': self.id})
 
     ###################
     def send_join_reply(self, gui, addr):
@@ -751,8 +776,8 @@ class SensorNode(wsn.Node):
                 self.send_join_reply(yellow_id, wsn.Addr(self.ch_addr.net_addr, yellow_id))
 
             if pck['type'] == 'NETWORK_REQUEST':  # it sends a network reply to requested node
-                # yield self.timeout(.5)
-                if self.role == Roles.ROOT:
+                # V2: Both ROOT and CH can assign network IDs
+                if self.role in [Roles.ROOT, Roles.CLUSTER_HEAD]:
                     # Check if this is a router promotion request
                     yellow_id = pck.get('yellow_id')
                     router_id = pck.get('router_id')
@@ -760,66 +785,26 @@ class SensorNode(wsn.Node):
                     if yellow_id and router_id:
                         # Router promotion: allocate address for yellow CH
                         new_addr = wsn.Addr(yellow_id, 254)
-                        self.log(f"[ROOT] Approved router promotion: yellow {yellow_id} → CH, router {router_id}")
+                        self.log(f"[{self.role.name}] Approved router promotion: yellow {yellow_id} → CH, router {router_id}")
                         
-                        # Send NETWORK_REPLY with router info back through the tree
-                        self.route_and_forward_package({
+                        # FIX 2: Use direct send (not routing) for NETWORK_REPLY to prevent loops
+                        self.send({
                             'dest': pck['source'],
                             'type': 'NETWORK_REPLY',
                             'source': self.addr,
                             'addr': new_addr,
                             'yellow_id': yellow_id,
-                            'router_id': router_id
+                            'router_id': router_id,
+                            'gui': self.id
                         })
+                        self.log(f"[{self.role.name}] Sent NETWORK_REPLY to green {router_id} (direct send)")
                     else:
                         # Normal CH promotion (existing logic)
                         new_addr = wsn.Addr(pck['source'].node_addr, 254)
+                        self.log(f"[{self.role.name}] Approved CH promotion: {pck['source'].node_addr} → CH")
                         self.send_network_reply(pck['source'], new_addr)
             if pck['type'] == 'JOIN_ACK':
                 joining_node_id = pck['gui']
-                
-                # Broadcast that this node joined as a member (for cancellation detection)
-                self.send({
-                    'dest': wsn.BROADCAST_ADDR,
-                    'type': 'YELLOW_JOINED_CH',
-                    'yellow_id': joining_node_id,
-                    'ch_id': self.id,
-                    'gui': self.id
-                })
-                
-                # Check if we're currently promoting this node via router logic
-                if self.active_router_promotion == joining_node_id:
-                    self.log(f"[CH] Node {joining_node_id} joined as member - CANCELLING router promotion")
-                    
-                    # Cancel the router promotion
-                    self.active_router_promotion = None
-                    selected_green = self.active_router_green
-                    self.active_router_green = None
-                    
-                    # Cancel nomination processing timer (if still running)
-                    if joining_node_id in self.nomination_timers:
-                        timer_name = self.nomination_timers[joining_node_id]
-                        self.kill_timer(timer_name)
-                        del self.nomination_timers[joining_node_id]
-                    
-                    # Clear pending nominations
-                    if joining_node_id in self.pending_nominations:
-                        del self.pending_nominations[joining_node_id]
-                    
-                    # Send cancellation to the green that was selected (if any)
-                    if selected_green is not None:
-                        for gui, neighbor in self.neighbors_table.items():
-                            if gui == selected_green:
-                                self.send({
-                                    'dest': neighbor['addr'],
-                                    'type': 'ROUTER_PROMOTION_CANCELLED',
-                                    'yellow_id': joining_node_id,
-                                    'reason': 'yellow_joined_ch',
-                                    'gui': self.id
-                                })
-                                break
-                    
-                    self.log(f"[CH] Router promotion cancelled, lock released, ready for next yellow")
                 
                 self.members_table.append(pck['gui'])
                 self.cluster_size += 1
@@ -828,106 +813,10 @@ class SensorNode(wsn.Node):
                 self.child_networks_table[pck['gui']] = pck['child_networks']
                 if self.role != Roles.ROOT:
                     self.send_network_update()
-
-            if pck['type'] == 'ROUTER_NOMINATION':
-                # ROOT/CH receives nomination from REGISTERED node for external yellow
-                if (self.role == Roles.ROOT or self.role == Roles.CLUSTER_HEAD) and ENABLE_ROUTER_LAYER:
-                    yellow_id = pck['yellow_id']
-                    nominator_id = pck['nominator_id']
-                    nominator_addr = pck['nominator_addr']
-                    distance = pck['distance']
-                    timestamp = pck['timestamp']
-                    
-                    # TIME-BASED SELECTION: Only process ONE yellow at a time
-                    if self.active_router_promotion is not None and self.active_router_promotion != yellow_id:
-                        self.log(f"[CH] Ignoring nomination for yellow {yellow_id} - already promoting yellow {self.active_router_promotion}")
-                        return
-                    
-                    # Initialize nomination collection
-                    if yellow_id not in self.pending_nominations:
-                        # Mark this yellow as active promotion
-                        self.active_router_promotion = yellow_id
-                        self.pending_nominations[yellow_id] = []
-                        timer_name = f'TIMER_PROCESS_NOMINATIONS_{yellow_id}'
-                        self.nomination_timers[yellow_id] = timer_name
-                        self.set_timer(timer_name, 2.0)
-                        self.log(f"[CH] Started router promotion for yellow {yellow_id} (FIRST yellow)")
-                    
-                    self.pending_nominations[yellow_id].append({
-                        'nominator_id': nominator_id,
-                        'nominator_addr': nominator_addr,
-                        'distance': distance,
-                        'timestamp': timestamp
-                    })
-                    
-                    self.log(f"[CH] Received nomination from {nominator_id} for yellow {yellow_id} (dist: {distance:.1f}m, total: {len(self.pending_nominations[yellow_id])})")
-            
-            if pck['type'] == 'YELLOW_JOINED_CH':
-                # Another CH accepted this yellow as a member - cancel promotion if we're doing it
-                if (self.role == Roles.ROOT or self.role == Roles.CLUSTER_HEAD) and ENABLE_ROUTER_LAYER:
-                    yellow_id = pck.get('yellow_id')
-                    ch_id = pck.get('ch_id')
-                    
-                    # Check if we're currently promoting this yellow
-                    if self.active_router_promotion == yellow_id:
-                        self.log(f"[CH] Node {yellow_id} joined CH {ch_id} - CANCELLING our router promotion")
-                        
-                        # Cancel the router promotion
-                        self.active_router_promotion = None
-                        selected_green = self.active_router_green
-                        self.active_router_green = None
-                        
-                        # Cancel nomination processing timer (if still running)
-                        if yellow_id in self.nomination_timers:
-                            timer_name = self.nomination_timers[yellow_id]
-                            self.kill_timer(timer_name)
-                            del self.nomination_timers[yellow_id]
-                        
-                        # Clear pending nominations
-                        if yellow_id in self.pending_nominations:
-                            del self.pending_nominations[yellow_id]
-                        
-                        # Send cancellation to the green that was selected (if any)
-                        if selected_green is not None:
-                            for gui, neighbor in self.neighbors_table.items():
-                                if gui == selected_green:
-                                    self.send({
-                                        'dest': neighbor['addr'],
-                                        'type': 'ROUTER_PROMOTION_CANCELLED',
-                                        'yellow_id': yellow_id,
-                                        'reason': 'yellow_joined_other_ch',
-                                        'gui': self.id
-                                    })
-                                    break
-                        
-                        self.log(f"[CH] Lock released, ready for next yellow")
-            
-            if pck['type'] == 'ROUTER_PROMOTION_COMPLETE':
-
-                if (self.role == Roles.ROOT or self.role == Roles.CLUSTER_HEAD) and ENABLE_ROUTER_LAYER:
-
-                    # Verify this is the expected promotion
-                    if self.active_router_promotion == yellow_id and self.active_router_green == router_id:
-                        self.active_router_promotion = None
-                        self.active_router_green = None
-                        
-                        # Clean up all tracking data
-                        if yellow_id in self.pending_nominations:
-                            del self.pending_nominations[yellow_id]
-                        
-                        if yellow_id in self.nomination_timers:
-                            del self.nomination_timers[yellow_id]
-                        
-                        self.log(f"[CH] Router promotion complete for yellow {yellow_id}, lock cleared, ready for next yellow")
-                    else:
-                        self.log(f"[CH] Received ROUTER_PROMOTION_COMPLETE for {yellow_id} but not currently promoting it")
-            
-
         elif self.role == Roles.REGISTERED:  # if the node is registered
             if pck['type'] == 'HEART_BEAT':
                 self.update_neighbor(pck)
             if pck['type'] == 'PROBE':
-                self.log(f"[HEARTBEAT] Received PROBE, sending HEARTBEAT response")
                 self.send_heart_beat()
             if pck['type'] == 'JOIN_REQUEST':  # REGISTERED node receives JOIN_REQUEST
                 yellow_id = pck['gui']
@@ -935,8 +824,8 @@ class SensorNode(wsn.Node):
                 if not ENABLE_ROUTER_LAYER:
                     # Router layer disabled - forward to parent for normal join
                     if self.parent_gui is not None and self.parent_gui in self.neighbors_table:
-                        parent_ch_addr = self.neighbors_table[self.parent_gui].get('ch_addr')
-                        if parent_ch_addr:
+                        parent_ch_addr = self.neighbors_tables[self.parent_gui].get('ch_addr')
+                        if parent_ch_addr: 
                             self.send({
                                 'dest': parent_ch_addr,
                                 'type': 'JOIN_REQUEST',
@@ -944,42 +833,26 @@ class SensorNode(wsn.Node):
                                 'source': pck.get('source', self.addr)
                             })
                     return
-                
-                # Calculate distance to yellow
-                distance = self.calculate_distance_to_node(yellow_id)
-                
-                # Send nomination to parent (CH or ROOT)
-                # No distance threshold check - just send distance, let parent decide
-                parent_addr = None
-                if self.parent_gui is not None and self.parent_gui in self.neighbors_table:
-                    parent_addr = self.neighbors_table[self.parent_gui].get('ch_addr') or self.neighbors_table[self.parent_gui].get('addr')
-                elif self.ch_addr is not None:
-                    parent_addr = self.ch_addr
-                
-                if parent_addr:
-                    self.send({
-                        'dest': parent_addr,
-                        'type': 'ROUTER_NOMINATION',
-                        'yellow_id': yellow_id,
-                        'nominator_id': self.id,
-                        'nominator_addr': self.addr,
-                        'distance': distance,
-                        'timestamp': self.now,
-                        'gui': self.id
-                    })
-                    self.log(f"[ROUTER] Nominated self for yellow {yellow_id} (dist: {distance:.1f}m)")
+                if yellow_id not in self.neighbors_table:
+                  return  # Not a neighbor, can't help
+               
+                yellow_addr = pck.get('source')  # Yellow's address from JOIN_REQUEST packet
+                distance = self.neighbors_table[yellow_id].get('distance', 999999)
+
+                # Send ROUTER_AVAILABLE with distance info back to yellow
+                self.send({
+                    'dest': yellow_addr,  # Send directly to yellow (not parent)
+                    'type': 'ROUTER_AVAILABLE',
+                    'dest_gui': yellow_id,
+                    'green_id': self.id,
+                    'green_addr': self.addr,
+                    'distance': distance,  # Include distance
+                    'gui': self.id
+                        })  
+
+                self.log(f"[GREEN] Sent ROUTER_AVAILABLE to outer yellow {yellow_id}")
                 return
-            if pck['type'] == 'ROUTER_PROMOTION_CANCELLED':
-                # CH cancelled the router promotion
-                yellow_id = pck.get('yellow_id')
-                reason = pck.get('reason', 'unknown')
-                
-                self.log(f"[ROUTER] Router promotion cancelled for yellow {yellow_id} (reason: {reason})")
-                
-                # Mark this yellow as cancelled so we ignore NETWORK_REPLY if it comes
-                self.cancelled_promotions.add(yellow_id)
-                return
-            
+
             if pck['type'] == 'NETWORK_REPLY':  # it becomes cluster head or router based on context
                 # Check if this is a router promotion reply
                 yellow_id = pck.get('yellow_id')
@@ -992,6 +865,11 @@ class SensorNode(wsn.Node):
                     return
                 
                 if yellow_id and router_id and router_id == self.id:
+                    # FIX 3: Deduplicate NETWORK_REPLY - check if already became router for this yellow
+                    if self.role == Roles.ROUTER and yellow_id in self.connected_CHs:
+                        self.log(f"[ROUTER] Ignoring duplicate NETWORK_REPLY for yellow {yellow_id} (already router)")
+                        return
+                    
                     # This is a router promotion - I should become ROUTER, not CH
                     new_ch_addr = pck['addr']
                     
@@ -1002,6 +880,9 @@ class SensorNode(wsn.Node):
                     #self.ch_addr = self.addr
                     self.connected_CHs = [self.ch_addr, yellow_id]
                     self.set_timer('TIMER_ROUTER_HB', ROUTER_HEARTBEAT_INTERVAL)
+                    
+                    # FIX 1: Clear deduplication set (router can handle new requests)
+                    self.router_requests_sent.clear()
                     
                     # Send BECOME_CH to yellow
                     self.send({
@@ -1039,33 +920,59 @@ class SensorNode(wsn.Node):
                         self.send_join_reply(gui, wsn.Addr(self.ch_addr.net_addr,gui))
                     
                     self.log(f"Became CH: sent {len(self.received_JR_guis)} join replies")
-                    self.waiting_for_router_promotion = False
-            if pck['type'] == 'ROUTER_APPROVAL':
-                # CH/ROOT selected this REGISTERED node as router for external yellow
-                yellow_id = pck['yellow_id']
-                router_id = pck['router_id']
+
+            if pck['type'] == 'ROUTER_REQUEST':
+                # V2: Yellow selected this green as router
+                yellow_id = pck.get('yellow_id')
+                green_id = pck.get('green_id')
                 
-                if router_id == self.id:
-                    self.log(f"[ROUTER] Approved as router for yellow {yellow_id}, requesting CH promotion from ROOT")
+                if green_id == self.id:
+                    # FIX 1: Check if already sent NETWORK_REQUEST for this yellow (deduplication)
+                    if yellow_id in self.router_requests_sent:
+                        self.log(f"[GREEN] Already sent NETWORK_REQUEST for yellow {yellow_id}, ignoring duplicate")
+                        return
                     
-                    # Send NETWORK_REQUEST to ROOT with router promotion info
-                    self.route_and_forward_package({
-                        'dest': self.root_addr,
-                        'type': 'NETWORK_REQUEST',
-                        'source': self.addr,
-                        'yellow_id': yellow_id,
-                        'router_id': self.id
-                    })
+                    # Check if still REGISTERED
+                    if self.role != Roles.REGISTERED:
+                        self.log(f"[GREEN] Received ROUTER_REQUEST but no longer REGISTERED (now {self.role.name})")
+                        # Send failure to yellow
+                        self.send({
+                            'dest': wsn.BROADCAST_ADDR,
+                            'type': 'ROUTER_REQUEST_FAILED',
+                            'dest_gui': yellow_id,
+                            'green_id': self.id,
+                            'reason': 'no_longer_registered',
+                            'gui': self.id
+                        })
+                        return
+                    
+                    # Mark as sent (deduplication)
+                    self.router_requests_sent.add(yellow_id)
+                    
+                    self.log(f"[GREEN] Yellow {yellow_id} selected me as router, requesting network ID")
+                    
+                    # FIX 2: Use direct send (not routing) for NETWORK_REQUEST to prevent loops
+                    parent_addr = None
+                    if self.parent_gui is not None and self.parent_gui in self.neighbors_table:
+                        parent_addr = self.neighbors_table[self.parent_gui].get('ch_addr') or self.neighbors_table[self.parent_gui].get('addr')
+                    elif self.ch_addr is not None:
+                        parent_addr = self.ch_addr
+                    
+                    if parent_addr:
+                        self.send({
+                            'dest': parent_addr,
+                            'type': 'NETWORK_REQUEST',
+                            'source': self.addr,
+                            'yellow_id': yellow_id,
+                            'router_id': self.id,
+                            'gui': self.id
+                        })
+                        self.log(f"[GREEN] Sent NETWORK_REQUEST to parent (direct send)")
+                    else:
+                        self.log(f"[GREEN] ERROR: No parent to send NETWORK_REQUEST")
+                return
             
-            if pck['type'] == 'ROUTER_REJECTION':
-                # Another REGISTERED node was closer to the yellow
-                yellow_id = pck['yellow_id']
-                self.log(f"[ROUTER] Rejected as router for yellow {yellow_id} (another node was closer)")
-            
-            if pck['type'] == 'ROUTER_REUSE_APPROVAL':
-                # This should not reach REGISTERED, only ROUTER
-                # But handle it just in case
-                pass
+
         
         elif self.role == Roles.ROUTER:  # if the node is a router
             if pck['type'] == 'HEART_BEAT':
@@ -1159,6 +1066,47 @@ class SensorNode(wsn.Node):
         if self.role == Roles.UNREGISTERED:  # if the node is unregistered
             if pck['type'] == 'HEART_BEAT':
                 self.update_neighbor(pck)
+            
+            if pck['type'] == 'ROUTER_REQUEST_FAILED':
+                # Green failed to become router
+                if pck.get('dest_gui') == self.id:
+                    green_id = pck.get('green_id')
+                    reason = pck.get('reason', 'unknown')
+                    self.log(f"[YELLOW] Green {green_id} failed (reason: {reason}), will prefer CH for next join")
+                    # FIX 1: Reset state so yellow can join CHs or retry
+                    self.processing_nominations = False
+                    self.prefer_ch_join = True  # Prefer CH since green failed
+                    # Will retry on next TIMER_JOIN_REQUEST
+            
+            if pck['type'] == 'ROUTER_AVAILABLE':
+                # V2: Yellow receives ROUTER_AVAILABLE from green directly
+                if pck.get('dest_gui') == self.id and ENABLE_ROUTER_LAYER:
+                    green_id = pck.get('green_id')
+                    green_addr = pck.get('green_addr')
+                    
+                    # Check if already processing or selected a green
+                    if self.processing_nominations:
+                        return  # Already selected a green
+                    
+                    # Add to available greens list
+                    if not hasattr(self, 'available_greens'):
+                        self.available_greens = []
+                        # Start timer to collect greens for 2 seconds
+                        self.set_timer('TIMER_SELECT_GREEN', 2.0)
+                        self.log(f"[YELLOW] Started collecting greens (2s)")
+                    
+                    # Check if green is in neighbors (has distance)
+                    if green_id in self.neighbors_table:
+                        distance = self.neighbors_table[green_id].get('distance', 999999)
+                        self.available_greens.append({
+                            'green_id': green_id,
+                            'green_addr': green_addr,
+                            'distance': distance
+                        })
+                        self.log(f"[YELLOW] Green {green_id} available (dist: {distance:.1f}m, total: {len(self.available_greens)})")
+                    else:
+                        self.log(f"[YELLOW] Green {green_id} not in neighbors, skipping")
+            
             if pck['type'] == 'BECOME_CH':  # ROUTER tells yellow to become CH
                 if pck.get('dest_gui') == self.id and ENABLE_ROUTER_LAYER:
                     router_id = pck.get('router_id')
@@ -1190,29 +1138,22 @@ class SensorNode(wsn.Node):
                     if router_id in self.neighbors_table:
                         self.draw_parent()
                     
-                    # Start heartbeat
+                    # FIX 2: Start heartbeat (send initial + start periodic timer)
                     self.send_heart_beat()
                     self.set_timer('TIMER_HEART_BEAT', config.HEARTH_BEAT_TIME_INTERVAL)
+                    self.log(f"[CH] Started periodic heartbeat timer (interval: {config.HEARTH_BEAT_TIME_INTERVAL}s)")
                     
                     # Send network update to inform parent of new CH
                     self.send_network_update()
                     
-                    self.log(f"[ROUTER] Became CH (promoted by router {router_id})")
-                    self.waiting_for_router_promotion = False
-                    # Send completion message to parent CH/ROOT to unlock
-                    if router_id in self.neighbors_table:
-                        router_node = self.neighbors_table[router_id]
-                        parent_ch_addr = router_node.get('ch_addr')  # Router's parent CH/ROOT
-                        
-                        if parent_ch_addr:
-                            self.send({
-                                'dest': parent_ch_addr,
-                                'type': 'ROUTER_PROMOTION_COMPLETE',
-                                'yellow_id': self.id,
-                                'router_id': router_id,
-                                'gui': self.id
-                            })
-                            self.log(f"[ROUTER] Sent promotion complete to unlock parent CH/ROOT")
+                    self.log(f"[ROUTER] Became CH (promoted by router {router_id}), ready to accept members")
+                    self.router_logic_enabled = False
+                    
+                    # Clean up yellow state
+                    if hasattr(self, 'available_greens'):
+                        del self.available_greens
+                    self.processing_nominations = False
+                    
                     return
             if pck['type'] == 'JOIN_REPLY':  # it becomes registered and sends join ack if the message is sent to itself once received join reply
                 if pck['dest_gui'] == self.id:
@@ -1236,7 +1177,7 @@ class SensorNode(wsn.Node):
                     else:
                         # Become REGISTERED
                         self.set_role(Roles.REGISTERED)
-                    self.waiting_for_router_promotion = False
+                    self.prefer_ch_join = False  # Reset flag after successful join
                     
                     # # sensor implementation
                     # timer_duration =  self.id % 20
@@ -1279,9 +1220,9 @@ class SensorNode(wsn.Node):
                     self.set_timer('TIMER_PROBE', 30)
 
         elif name == 'TIMER_HEART_BEAT':  # it sends heart beat message once heart beat timer fired
-            # Log heartbeat for REGISTERED nodes to debug yellow discovery issues
-            #if self.role == Roles.REGISTERED:
-                #self.log(f"[HEARTBEAT] Sending periodic heartbeat (role=REGISTERED)")
+            # FIX 2: Add debug logging for CH heartbeats
+            if self.role == Roles.CLUSTER_HEAD:
+                self.log(f"[CH-HB] Sending periodic heartbeat (cluster_size: {self.cluster_size})")
             self.send_heart_beat()
             # CTM-AdHoc: Clean stale neighbors periodically
             self.clean_stale_neighbors()
@@ -1347,69 +1288,39 @@ class SensorNode(wsn.Node):
             # This timer is no longer used - yellows wait naturally via TIMER_JOIN_REQUEST
             pass
 
-        elif name.startswith('TIMER_PROCESS_NOMINATIONS_'):
-            # CH/ROOT processes nominations for a yellow node
-            yellow_id = int(name.split('_')[-1])
-            
-            if yellow_id not in self.pending_nominations:
-                return
-            
-            nominations = self.pending_nominations[yellow_id]
-            
-            if len(nominations) == 0:
-                self.log(f"[ROUTER] No nominations for yellow {yellow_id}")
-                del self.pending_nominations[yellow_id]
-                if yellow_id in self.nomination_timers:
-                    del self.nomination_timers[yellow_id]
-                return
-            
-            # Select nomination with smallest distance (nearest green)
-            # Use nominator_id as tiebreaker for equal distances
-            # Only select REGISTERED nodes (not already routers)
-            registered_nominations = [n for n in nominations 
-                                     if self.is_node_registered(n['nominator_id'])]
-            
-            if len(registered_nominations) == 0:
-                self.log(f"[ROUTER] No available greens for yellow {yellow_id} (all are routers)")
-                # Clear active promotion so next yellow can be processed
-                if self.active_router_promotion == yellow_id:
-                    self.active_router_promotion = None
-                del self.pending_nominations[yellow_id]
-                if yellow_id in self.nomination_timers:
-                    del self.nomination_timers[yellow_id]
-                return
-            
-            selected = min(registered_nominations, key=lambda n: (n['distance'], n['nominator_id']))
-            
-            self.log(f"[ROUTER] Selected {selected['nominator_id']} as router for yellow {yellow_id} "
-                     f"(dist: {selected['distance']:.1f}m, {len(nominations)} candidates)")
-            
-            # Track which green is being promoted (for event-based lock clearing)
-            self.active_router_green = selected['nominator_id']
-            
-            # Send approval to selected router
-            self.send({
-                'dest': selected['nominator_addr'],
-                'type': 'ROUTER_APPROVAL',
-                'yellow_id': yellow_id,
-                'router_id': selected['nominator_id'],
-                'gui': self.id
-            })
-            
-            # Send rejection to others
-            for nom in nominations:
-                if nom['nominator_id'] != selected['nominator_id']:
-                    self.send({
-                        'dest': nom['nominator_addr'],
-                        'type': 'ROUTER_REJECTION',
-                        'yellow_id': yellow_id,
-                        'gui': self.id
-                    })
-
-            
-            # Lock stays set until ROUTER_PROMOTION_COMPLETE or cancellation
-            self.log(f"[CH] Waiting for router promotion to complete for yellow {yellow_id}")
+        elif name == 'TIMER_SELECT_GREEN':
+            # V2: Yellow selects closest green after collecting for 2 seconds
+            if self.role == Roles.UNREGISTERED and hasattr(self, 'available_greens'):
+                if len(self.available_greens) == 0:
+                    self.log(f"[YELLOW] No greens available, will prefer CH for next join")
+                    del self.available_greens
+                    # FIX 1: Reset state so yellow can join CHs
+                    self.processing_nominations = False
+                    self.prefer_ch_join = True  # Prefer CH since no greens available
+                    return
+                
+                # Select closest green
+                best_green = min(self.available_greens, key=lambda g: g['distance'])
+                self.log(f"[YELLOW] Selected green {best_green['green_id']} (dist: {best_green['distance']:.1f}m) from {len(self.available_greens)} options")
+                
+                # Mark as processing
+                self.processing_nominations = True
+                
+                # Send ROUTER_REQUEST directly to selected green
+                self.send({
+                    'dest': best_green['green_addr'],
+                    'type': 'ROUTER_REQUEST',
+                    'yellow_id': self.id,
+                    'green_id': best_green['green_id'],
+                    'gui': self.id
+                })
+                
+                self.log(f"[YELLOW] Sent ROUTER_REQUEST to green {best_green['green_id']}")
+                
+                # Clean up
+                del self.available_greens
         
+
         elif name == 'TIMER_ROUTER_HB':  # ROUTER sends heartbeat to maintain links
             if self.role == Roles.ROUTER and ENABLE_ROUTER_LAYER:
                 # Send ROUTER_HEARTBEAT to all connected CHs
@@ -1817,7 +1728,7 @@ sys.stderr = tee_logger
 # start the simulation
 try:
     print("=" * 80)
-    print("SIMULATION LOG - V1")
+    print("SIMULATION LOG - V2")
     print("=" * 80)
     print("Starting simulation...")
     print(f"Duration: {config.SIM_DURATION}s, Nodes: {config.SIM_NODE_COUNT}")

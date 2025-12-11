@@ -10,7 +10,7 @@ This is a **Data Collection Tree (DCT)** simulation for a Wireless Sensor Networ
 
 ### Network Formation
 1. **Node Startup** - All 100 nodes appear on the visualization panel, then wake up after a startup delay
-2. **Root Election** - One node becomes the ROOT (network coordinator)
+2. **Root Election** - One node becomes the ROOT 
 3. **Initial Cluster Formation** - Nodes near ROOT join as REGISTERED (green)
 4. **Router Promotion** - Distant yellow nodes trigger router nomination from nearby greens
 5. **Router Selection** - Parent CH selects closest green as ROUTER based on distance
@@ -228,34 +228,6 @@ cut -d',' -f6 message_log.csv | sort | uniq -c
 grep "^23," message_log.csv
 ```
 
----
-
-## Python Analysis
-
-```python
-import pandas as pd
-
-# Load tables
-neighbors = pd.read_csv('neighbors_table.csv')
-members = pd.read_csv('members_table.csv')
-messages = pd.read_csv('message_log.csv')
-
-# Network summary
-print(f"Total nodes: {len(neighbors)}")
-print(f"Cluster heads: {len(members[members['node_role'] == 'CLUSTER_HEAD'])}")
-print(f"Average neighbors: {neighbors['neighbor_count'].mean():.1f}")
-
-# Cluster analysis
-chs = members[members['node_role'] == 'CLUSTER_HEAD']
-print(f"Average members per CH: {chs['member_count'].mean():.1f}")
-
-# Message analysis
-print(f"Total messages: {len(messages)}")
-print(messages['message_type'].value_counts())
-```
-
----
-
 ## Troubleshooting
 
 ### Too many CHs (50+)
@@ -274,32 +246,7 @@ print(messages['message_type'].value_counts())
 **Cause:** Simulation too short  
 **Fix:** Run longer or check `NODE_STARTUP_DELAY`
 
----
 
-## File Structure
-
-```
-wsnlab/
-├── data_collection_tree.py      # Main simulation with router layer
-├── read_stats.py                # Statistics analyzer
-├── source/
-│   ├── config.py                # Configuration parameters
-│   └── wsnlab_vis.py            # Visualization library
-├── topovis/                     # Visualization components
-│   ├── TopoVis.py               # Topology visualization
-│   └── TkPlotter.py             # Tkinter plotting
-├── README.md                     # This file
-├── neighbors_table.csv           # Generated: neighbor tables
-├── members_table.csv             # Generated: cluster members
-├── child_networks_table.csv      # Generated: tree structure
-├── message_log.csv               # Generated: message trace
-├── routing_statistics.csv        # Generated: routing stats
-└── node_distances.csv            # Generated: topology
-```
-
----
-
-## Key Algorithms
 
 ### Router Layer Algorithm
 1. **Yellow Detection** - Unregistered node (yellow) broadcasts JOIN_REQUEST
@@ -333,34 +280,6 @@ wsnlab/
 3. If no response, becomes CLUSTER_HEAD (blue)
 4. Sends HEART_BEAT to attract members
 
----
-
-## Performance Metrics
-
-### Network Formation Time
-- **Startup:** 5 seconds (all nodes appear)
-- **Root election:** 10-15 seconds
-- **CH formation:** 30-50 seconds
-- **Full registration:** 70-120 seconds
-
-### Routing Efficiency
-- **Direct mesh:** 30-40% of routes
-- **Intra-cluster:** 20-30% of routes
-- **Tree routing:** 30-40% of routes
-- **Route failures:** <1%
-
----
-
-## References
-
-- **CTM-AdHoc:** Hybrid routing combining tree and mesh
-- **Data Collection Tree:** Hierarchical network structure
-- **Cluster Head:** Coordinator node managing a cluster
-- **Multi-hop:** Routes through intermediate nodes
-
----
-
-## Technical Implementation
 
 ### Core Components
 - **SensorNode Class** - Main node implementation with role-based behavior
@@ -380,43 +299,3 @@ wsnlab/
 - `BECOME_CH` - Router promotes yellow to CH
 - `ROUTER_PROMOTION_COMPLETE` - Unlock parent CH after promotion
 - `ROUTER_REGISTER` - Router registers with parent CH
-
-### Key Features
-- **Distance-Based Selection** - Euclidean distance calculation for optimal router
-- **Time-Based Locking** - Only one yellow promoted at a time per CH
-- **Deterministic Seeding** - Reproducible network topology (NETWORK_SEED = 42)
-- **Real-Time Visualization** - Color-coded nodes show role changes
-- **Comprehensive Logging** - Detailed logs for debugging and analysis
-
----
-
-## Summary
-
-This simulation demonstrates:
-✓ Hierarchical network formation with router layer  
-✓ Automatic router promotion for multi-hop coverage  
-✓ Distance-based competitive router selection  
-✓ Cluster-based organization with adaptive management  
-✓ Hybrid CTM-AdHoc routing strategies  
-✓ Event-driven lock management for race condition prevention  
-✓ Multi-hop neighbor discovery  
-✓ Self-organizing network topology  
-
-All with **clean, merged CSV outputs** for easy analysis!
-
----
-
-## Research & Academic Use
-
-This project demonstrates advanced WSN concepts:
-- Self-organizing hierarchical networks
-- Dynamic router layer for scalability
-- Hybrid routing protocol design
-- Distributed coordination algorithms
-- Event-driven network protocols
-
-Suitable for:
-- Wireless sensor network research
-- Network protocol development
-- Distributed systems education
-- IoT architecture studies
