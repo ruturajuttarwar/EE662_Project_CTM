@@ -612,41 +612,21 @@ Node #36 [ 661.29278] [GREEN] Requesting promotion for yellow 35
 Node #11 [ 661.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
 Node #21 [ 661.29348] [GREEN] Requesting promotion for yellow 11
 Node #20 [ 661.29350] [GREEN] Requesting promotion for yellow 11
-Node #35 [ 676.29268] [JOIN] Selecting REGISTERED 36 (dist=96.9m) - direct to green
-Node #36 [ 676.29278] [GREEN] Requesting promotion for yellow 35
-Node #11 [ 676.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
-Node #21 [ 676.29348] [GREEN] Requesting promotion for yellow 11
-Node #20 [ 676.29350] [GREEN] Requesting promotion for yellow 11
-Node #35 [ 691.29268] [JOIN] Selecting REGISTERED 36 (dist=96.9m) - direct to green
-Node #36 [ 691.29278] [GREEN] Requesting promotion for yellow 35
-Node #11 [ 691.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
-Node #21 [ 691.29348] [GREEN] Requesting promotion for yellow 11
-Node #20 [ 691.29350] [GREEN] Requesting promotion for yellow 11
-Node #35 [ 706.29268] [JOIN] Selecting REGISTERED 36 (dist=96.9m) - direct to green
-Node #36 [ 706.29278] [GREEN] Requesting promotion for yellow 35
-Node #11 [ 706.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
-Node #21 [ 706.29348] [GREEN] Requesting promotion for yellow 11
-Node #20 [ 706.29350] [GREEN] Requesting promotion for yellow 11
-Node #35 [ 721.29268] [JOIN] Selecting REGISTERED 36 (dist=96.9m) - direct to green
-Node #36 [ 721.29278] [GREEN] Requesting promotion for yellow 35
-Node #11 [ 721.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
-Node #21 [ 721.29348] [GREEN] Requesting promotion for yellow 11
-Node #20 [ 721.29350] [GREEN] Requesting promotion for yellow 11
-Node #35 [ 736.29268] [JOIN] Selecting REGISTERED 36 (dist=96.9m) - direct to green
-Node #36 [ 736.29278] [GREEN] Requesting promotion for yellow 35
-Node #11 [ 736.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
-Node #21 [ 736.29348] [GREEN] Requesting promotion for yellow 11
-Node #20 [ 736.29350] [GREEN] Requesting promotion for yellow 11
-Node #35 [ 751.29268] [JOIN] Selecting REGISTERED 36 (dist=96.9m) - direct to green
-Node #36 [ 751.29278] [GREEN] Requesting promotion for yellow 35
-Node #11 [ 751.29342] [JOIN] Selecting REGISTERED 20 (dist=89.1m) - direct to green
-Node #21 [ 751.29348] [GREEN] Requesting promotion for yellow 11
-Node #20 [ 751.29350] [GREEN] Requesting promotion for yellow 11
 
 
 ⚠️  Simulation stopped by user (Ctrl+C)
+
+📊 Exporting network structure...
+✓ Exported: child_networks_table.csv
+✓ Exported: members_table.csv
+✓ Exported: neighbors_table.csv
 
 ✓ Simulation completed!
 
 
 ⚠️  Simulation stopped by user (Ctrl+C)
+
+📊 Exporting network structure...
+✓ Exported: child_networks_table.csv
+✓ Exported: members_table.csv
+✓ Exported: neighbors_table.csv

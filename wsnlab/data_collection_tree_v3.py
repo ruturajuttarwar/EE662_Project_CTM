@@ -924,10 +924,6 @@ class SensorNode(wsn.Node):
                 else:
                     # Normal CH promotion (existing logic)
                     self.set_role(Roles.CLUSTER_HEAD)
-                    try:
-                        write_clusterhead_distances_csv("clusterhead_distances.csv")
-                    except Exception as e:
-                        self.log(f"CH CSV export error: {e}")
                     self.scene.nodecolor(self.id, 0, 0, 1)
                     self.ch_addr = pck['addr']
                     self.cluster_size = 0  # Initialize cluster size
@@ -1329,24 +1325,9 @@ class SensorNode(wsn.Node):
         elif name == 'TIMER_EXPORT_CH_CSV':
             # Only root should drive exports (cheap guard)
             if self.role == Roles.ROOT:
-                write_clusterhead_distances_csv("clusterhead_distances.csv")
-                # reschedule
-                self.set_timer('TIMER_EXPORT_CH_CSV', config.EXPORT_CH_CSV_INTERVAL)
-        
-        elif name == 'TIMER_EXPORT_NEIGHBOR_CSV':
-            if self.role == Roles.ROOT:
-                write_neighbor_distances_csv("neighbor_distances.csv")
-                self.set_timer('TIMER_EXPORT_NEIGHBOR_CSV', config.EXPORT_NEIGHBOR_CSV_INTERVAL)
-        
-        elif name == 'TIMER_EXPORT_ROUTING_STATS':
-            if self.role == Roles.ROOT:
-                # Periodic export of routing statistics during simulation
-                try:
-                    write_routing_statistics_csv("routing_statistics.csv")
-                    self.log("Exported routing statistics")
-                except Exception as e:
-                    self.log(f"Stats export error: {e}")
-                self.set_timer('TIMER_EXPORT_ROUTING_STATS', 2000)  # Export every 500s
+                # REMOVED: Periodic CSV exports during simulation
+                # Only export 3 essential tables at end
+                pass
     
     ###################
     def is_node_registered(self, node_id):
@@ -1383,151 +1364,14 @@ ROOT_ID = random.randrange(config.SIM_NODE_COUNT)  # 0..count-1
 
 
 
-def write_node_distances_csv(path="node_distances.csv"):
-    """Write pairwise node-to-node Euclidean distances as an edge list."""
-    ids = sorted(NODE_POS.keys())
-    with open(path, "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["source_id", "target_id", "distance"])
-        for i, sid in enumerate(ids):
-            x1, y1 = NODE_POS[sid]
-            for tid in ids[i+1:]:  # i+1 to avoid duplicates and self-pairs
-                x2, y2 = NODE_POS[tid]
-                dist = math.hypot(x1 - x2, y1 - y2)
-                w.writerow([sid, tid, f"{dist:.6f}"])
-
-
-def write_node_distance_matrix_csv(path="node_distance_matrix.csv"):
-    ids = sorted(NODE_POS.keys())
-    with open(path, "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["node_id"] + ids)
-        for sid in ids:
-            x1, y1 = NODE_POS[sid]
-            row = [sid]
-            for tid in ids:
-                x2, y2 = NODE_POS[tid]
-                dist = math.hypot(x1 - x2, y1 - y2)
-                row.append(f"{dist:.6f}")
-            w.writerow(row)
-
-
-def write_clusterhead_distances_csv(path="clusterhead_distances.csv"):
-    """Write pairwise distances between current cluster heads."""
-    clusterheads = []
-    for node in sim.nodes:
-        # Only collect nodes that are cluster heads and have recorded positions
-        if hasattr(node, "role") and node.role == Roles.CLUSTER_HEAD and node.id in NODE_POS:
-            x, y = NODE_POS[node.id]
-            clusterheads.append((node.id, x, y))
-
-    if len(clusterheads) < 2:
-        # Still write the header so the file exists/is refreshed
-        with open(path, "w", newline="") as f:
-            csv.writer(f).writerow(["clusterhead_1", "clusterhead_2", "distance"])
-        return
-
-    with open(path, "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["clusterhead_1", "clusterhead_2", "distance"])
-        for i, (id1, x1, y1) in enumerate(clusterheads):
-            for id2, x2, y2 in clusterheads[i+1:]:
-                dist = math.hypot(x1 - x2, y1 - y2)
-                w.writerow([id1, id2, f"{dist:.6f}"])
-
-
-
-def write_neighbor_distances_csv(path="neighbor_distances.csv", dedupe_undirected=True):
-    """
-    Export neighbor distances per node.
-    Each row is (node -> neighbor) with distance from NODE_POS.
-
-    Args:
-        path (str): output CSV path
-        dedupe_undirected (bool): if True, writes each unordered pair once
-                                  (min(node_id,neighbor_id), max(...)).
-                                  If False, writes one row per direction.
-    """
-    # Safety: ensure we can compute distances
-    if not globals().get("NODE_POS"):
-        raise RuntimeError("NODE_POS is missing; record positions during create_network().")
-
-    # Prepare a set to avoid duplicates if dedupe_undirected=True
-    seen_pairs = set()
-
-    with open(path, "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["node_id", "neighbor_id", "distance",
-                    "neighbor_role", "neighbor_hop_count", "arrival_time"])
-
-        for node in sim.nodes:
-            # Skip nodes without any neighbor info yet
-            if not hasattr(node, "neighbors_table"):
-                continue
-
-            x1, y1 = NODE_POS.get(node.id, (None, None))
-            if x1 is None:
-                continue  # no position → cannot compute distance
-
-            # neighbors_table: key = neighbor GUI, value = heartbeat packet dict
-            for n_gui, pck in getattr(node, "neighbors_table", {}).items():
-                # Optional dedupe (unordered)
-                if dedupe_undirected:
-                    key = (min(node.id, n_gui), max(node.id, n_gui))
-                    if key in seen_pairs:
-                        continue
-                    seen_pairs.add(key)
-
-                # Position of neighbor
-                x2, y2 = NODE_POS.get(n_gui, (None, None))
-                if x2 is None:
-                    continue
-
-                # Distance (prefer pck['distance'] if you added it in update_neighbor)
-                dist = pck.get("distance")
-                if dist is None:
-                    dist = math.hypot(x1 - x2, y1 - y2)
-
-                # Extra fields (best-effort; may be missing)
-                n_role = getattr(pck.get("role", None), "name", pck.get("role", None))
-                hop = pck.get("hop_count", "")
-                at  = pck.get("arrival_time", "")
-
-                w.writerow([node.id, n_gui, f"{dist:.6f}", n_role, hop, at])
-
-
-def write_routing_statistics_csv(path="routing_statistics.csv"):
-    """Write CTM-AdHoc routing statistics for all nodes"""
-    with open(path, "w", newline="") as f:
-        w = csv.writer(f)
-        
-        # Header with multi-hop column if enabled
-        header = ["node_id", "role", "direct_mesh", "intra_cluster", 
-                 "downward_tree", "upward_tree"]
-        if ENABLE_MULTIHOP_NEIGHBORS:
-            header.append("multihop_routes")
-        header.extend(["route_failures", "total_routes", "neighbors_1hop", "neighbors_multihop", "cluster_size"])
-        w.writerow(header)
-        
-        for node in sim.nodes:
-            if hasattr(node, "routing_stats"):
-                stats = node.routing_stats
-                total = sum(stats.values())
-                role_name = node.role.name if hasattr(node, "role") else "UNKNOWN"
-                
-                row = [node.id, role_name, 
-                      stats['direct_mesh'], stats['intra_cluster'],
-                      stats['downward_tree'], stats['upward_tree']]
-                
-                if ENABLE_MULTIHOP_NEIGHBORS:
-                    row.append(stats.get('multihop_routes', 0))
-                
-                neighbors_1hop = len(getattr(node, 'neighbors_table', {}))
-                neighbors_multihop = len(getattr(node, 'multihop_neighbors', {}))
-                cluster_size = getattr(node, 'cluster_size', 0)
-                
-                row.extend([stats['route_failures'], total, neighbors_1hop, neighbors_multihop, cluster_size])
-                w.writerow(row)
+# ============================================================================
+# REMOVED: Unnecessary CSV exports (keeping only 3 essential tables)
+# - write_node_distances_csv
+# - write_node_distance_matrix_csv  
+# - write_clusterhead_distances_csv
+# - write_neighbor_distances_csv
+# - write_routing_statistics_csv
+# ============================================================================
 
 
 def write_child_networks_table_csv(path="child_networks_table.csv"):
@@ -1643,21 +1487,19 @@ sim = wsn.Simulator(
 # creating random network
 create_network(SensorNode, config.SIM_NODE_COUNT)
 
-write_node_distances_csv("node_distances.csv")
-write_node_distance_matrix_csv("node_distance_matrix.csv")
-
-# Function to export stats silently (called on exit or Ctrl+C)
+# Function to export 3 essential CSV tables (called on exit or Ctrl+C)
 def export_final_stats():
-    """Export statistics when simulation ends or is interrupted - silently"""
+    """Export 3 essential network structure tables"""
     try:
-        if ENABLE_HYBRID_ROUTING:
-            write_routing_statistics_csv("routing_statistics.csv")
-        # Export network structure tables
+        print("\n📊 Exporting network structure...")
         write_child_networks_table_csv("child_networks_table.csv")
         write_members_table_csv("members_table.csv")
         write_neighbors_table_csv("neighbors_table.csv")
+        print("✓ Exported: child_networks_table.csv")
+        print("✓ Exported: members_table.csv")
+        print("✓ Exported: neighbors_table.csv")
     except Exception as e:
-        print(f"Error exporting stats: {e}")
+        print(f"✗ Error exporting tables: {e}")
 
 # Register cleanup handlers
 atexit.register(export_final_stats)
