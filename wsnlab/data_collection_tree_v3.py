@@ -738,33 +738,6 @@ class SensorNode(wsn.Node):
                 yellow_id = pck['gui']
                 forwarded_by_router = pck.get('forwarded_by_router')
                 
-                # Check if this request was forwarded by a router
-                if forwarded_by_router and ENABLE_ROUTER_LAYER:
-                    # Request came through existing router - reuse that router
-                    self.log(f"[ROUTER] JOIN_REQUEST for {yellow_id} came through router {forwarded_by_router}, reusing router")
-                    
-                    # Send approval directly to router to make yellow a CH
-                    router_node = None
-                    for node in sim.nodes:
-                        if node.id == forwarded_by_router:
-                            router_node = node
-                            break
-                    
-                    if router_node and hasattr(router_node, 'addr'):
-                        # Allocate address for yellow as CH
-                        new_ch_addr = wsn.Addr(yellow_id, 254)
-                        
-                        # Send message to router to promote yellow to CH
-                        self.send({
-                            'dest': router_node.addr,
-                            'type': 'ROUTER_REUSE_APPROVAL',
-                            'yellow_id': yellow_id,
-                            'new_ch_addr': new_ch_addr,
-                            'router_id': forwarded_by_router,
-                            'gui': self.id
-                        })
-                        self.log(f"[ROUTER] Approved router {forwarded_by_router} reuse for yellow {yellow_id}")
-                    return
                 if not self.ch_addr:
                     self.log(f"[ERROR] {self.role.name} {self.id} has no ch_addr, cannot accept JOIN_REQUEST from {yellow_id}")
                     return
@@ -817,33 +790,6 @@ class SensorNode(wsn.Node):
                 return
 
             
-            if pck['type'] == 'YELLOW_JOINED_CH':
-                # Another CH accepted this yellow as a member - cancel promotion if we're doing it
-                if (self.role == Roles.ROOT or self.role == Roles.CLUSTER_HEAD) and ENABLE_ROUTER_LAYER:
-                    yellow_id = pck.get('yellow_id')
-                    ch_id = pck.get('ch_id')
-                    
-                    # Check if we're currently promoting this yellow
-                    if self.active_router_promotion == True:
-                        self.log(f"[CH] Node {yellow_id} joined CH {ch_id} - CANCELLING our router promotion")
-                        
-                        # Cancel the router promotion
-                        self.active_router_promotion = False
-                       
-                        
-                        # Cancel nomination processing timer (if still running)
-                        if yellow_id in self.nomination_timers:
-                            timer_name = self.nomination_timers[yellow_id]
-                            self.kill_timer(timer_name)
-                            del self.nomination_timers[yellow_id]
-                        
-                        # Clear pending nominations
-                        if yellow_id in self.pending_nominations:
-                            del self.pending_nominations[yellow_id]
-            
-                        
-                        self.log(f"[CH] Lock released, ready for next yellow")
-            
 
         elif self.role == Roles.REGISTERED:  # if the node is registered
             if pck['type'] == 'HEART_BEAT':
@@ -871,16 +817,6 @@ class SensorNode(wsn.Node):
                     })
                     self.log(f"[GREEN] Requesting promotion for yellow {yellow_id}")
                 return
-            if pck['type'] == 'ROUTER_PROMOTION_CANCELLED':
-                # CH cancelled the router promotion
-                yellow_id = pck.get('yellow_id')
-                reason = pck.get('reason', 'unknown')
-                
-                self.log(f"[ROUTER] Router promotion cancelled for yellow {yellow_id} (reason: {reason})")
-                
-                # Mark this yellow as cancelled so we ignore NETWORK_REPLY if it comes
-                self.cancelled_promotions.add(yellow_id)
-                return
             
             if pck['type'] == 'NETWORK_REPLY':  # it becomes cluster head or router based on context
                 # Check if this is a router promotion reply
@@ -905,6 +841,8 @@ class SensorNode(wsn.Node):
                     #self.ch_addr = self.addr
                     self.connected_CHs = [self.ch_addr, yellow_id]
                     self.set_timer('TIMER_ROUTER_HB', ROUTER_HEARTBEAT_INTERVAL)
+                    
+                    
                     
                     # Send BECOME_CH to yellow
                     self.send({
@@ -939,32 +877,6 @@ class SensorNode(wsn.Node):
                     
                     self.log(f"Became CH: sent {len(self.received_JR_guis)} join replies")
                     self.active_router_promotion = False
-            if pck['type'] == 'ROUTER_APPROVAL':
-                # CH/ROOT selected this REGISTERED node as router for external yellow
-                yellow_id = pck['yellow_id']
-                router_id = pck['router_id']
-                
-                if router_id == self.id:
-                    self.log(f"[ROUTER] Approved as router for yellow {yellow_id}, requesting CH promotion from ROOT")
-                    
-                    # Send NETWORK_REQUEST to ROOT with router promotion info
-                    self.route_and_forward_package({
-                        'dest': self.root_addr,
-                        'type': 'NETWORK_REQUEST',
-                        'source': self.addr,
-                        'yellow_id': yellow_id,
-                        'router_id': self.id
-                    })
-            
-            if pck['type'] == 'ROUTER_REJECTION':
-                # Another REGISTERED node was closer to the yellow
-                yellow_id = pck['yellow_id']
-                self.log(f"[ROUTER] Rejected as router for yellow {yellow_id} (another node was closer)")
-            
-            if pck['type'] == 'ROUTER_REUSE_APPROVAL':
-                # This should not reach REGISTERED, only ROUTER
-                # But handle it just in case
-                pass
         
         elif self.role == Roles.ROUTER:  # if the node is a router
             if pck['type'] == 'HEART_BEAT':
@@ -1020,34 +932,6 @@ class SensorNode(wsn.Node):
                             'source': self.addr,
                             'forwarded_by_router': self.id  # Mark that this came through router
                         })
-            
-            if pck['type'] == 'ROUTER_REUSE_APPROVAL':
-                # Router receives approval to reuse for new yellow CH
-                yellow_id = pck['yellow_id']
-                new_ch_addr = pck['new_ch_addr']
-                router_id = pck['router_id']
-                
-                if router_id == self.id:
-                    self.log(f"[ROUTER] Reusing router for yellow {yellow_id}, promoting to CH")
-                    
-                    # Add yellow to connected CHs
-                    if yellow_id not in self.connected_CHs:
-                        self.connected_CHs.append(yellow_id)
-                    
-                    # Send BECOME_CH to yellow
-                    self.send({
-                        'dest': wsn.BROADCAST_ADDR,
-                        'type': 'BECOME_CH',
-                        'dest_gui': yellow_id,
-                        'new_ch_addr': new_ch_addr,
-                        'root_addr': self.root_addr,
-                        'router_id': self.id,
-                        'router_addr': self.addr,
-                        'hop_count': self.hop_count + 1,  # Yellow CH will be one hop further
-                        'gui': self.id
-                    })
-                    
-                    self.log(f"[ROUTER] Now bridging {len(self.connected_CHs)} CHs: {self.connected_CHs}")
                 
         elif self.role == Roles.UNDISCOVERED:  # if the node is undiscovered
             if pck['type'] == 'HEART_BEAT':  # it kills probe timer, becomes unregistered and sets join request timer once received heart beat
@@ -1175,25 +1059,7 @@ class SensorNode(wsn.Node):
             if ENABLE_MULTIHOP_NEIGHBORS and self.role in [Roles.REGISTERED, Roles.CLUSTER_HEAD, Roles.ROOT, Roles.ROUTER]:
                 self.send_neighbor_table_share()
                 self.set_timer('TIMER_NEIGHBOR_SHARE', NEIGHBOR_SHARE_INTERVAL)
-        
-        elif name == 'TIMER_NEIGHBOR_SHARE':  # Multi-Hop: Share neighbor table periodically
-            if ENABLE_MULTIHOP_NEIGHBORS and self.role in [Roles.REGISTERED, Roles.CLUSTER_HEAD, Roles.ROOT]:
-                self.send_neighbor_table_share()
-                self.set_timer('TIMER_NEIGHBOR_SHARE', NEIGHBOR_SHARE_INTERVAL)
-        
-        #elif name == 'TIMER_YELLOW_CH':  # Yellow node becomes CH if stuck too long
-            #if self.role == Roles.UNREGISTERED:
-                # OLD LOGIC REMOVED: The checks for "potential parents", "recent CH heartbeat", 
-                # and "CH in range" were preventing yellows from ever becoming CHs via timeout.
-                # This conflicted with the router logic where yellows should either:
-                # 1. Join via router promotion (handled by TIMER_JOIN_REQUEST), OR
-                # 2. Become CH via timeout if truly stuck (this timer)
-                
-                # Simple fallback: If still yellow after timeout, become CH
-                #time_yellow = self.now - self.unregistered_since if self.unregistered_since else 0
-                #self.log(f"[YELLOW_CH] Timeout after {time_yellow:.1f}s, becoming CH as fallback")
-                
-                # Request to become CH directly from root
+
                 if len(self.neighbors_table) > 0:
                     # Find a registered neighbor to get root address
                     for gui, info in self.neighbors_table.items():
@@ -1227,107 +1093,6 @@ class SensorNode(wsn.Node):
             # Have candidates - try to join
             self.select_and_join()
         
-        elif name == 'TIMER_WAIT_FOR_RESPONSES':  # REMOVED - no longer needed
-            # This timer is no longer used - yellows wait naturally via TIMER_JOIN_REQUEST
-            pass
-
-        elif name.startswith('TIMER_PROCESS_NOMINATIONS_'):
-            # CH/ROOT processes nominations for a yellow node
-            yellow_id = int(name.split('_')[-1])
-            
-            if yellow_id not in self.pending_nominations:
-                return
-            
-            nominations = self.pending_nominations[yellow_id]
-            
-            if len(nominations) == 0:
-                self.log(f"[ROUTER] No nominations for yellow {yellow_id}")
-                del self.pending_nominations[yellow_id]
-                if yellow_id in self.nomination_timers:
-                    del self.nomination_timers[yellow_id]
-                return
-            
-            # Select nomination with smallest distance (nearest green)
-            # Use nominator_id as tiebreaker for equal distances
-            # Only select REGISTERED nodes (not already routers)
-            registered_nominations = [n for n in nominations 
-                                     if self.is_node_registered(n['nominator_id'])]
-            
-            if len(registered_nominations) == 0:
-                self.log(f"[ROUTER] No available greens for yellow {yellow_id} (all are routers)")
-                # Clear active promotion so next yellow can be processed
-                if self.active_router_promotion == True:
-                    self.active_router_promotion = False
-                del self.pending_nominations[yellow_id]
-                if yellow_id in self.nomination_timers:
-                    del self.nomination_timers[yellow_id]
-                return
-            
-            selected = min(registered_nominations, key=lambda n: (n['distance'], n['nominator_id']))
-            
-            self.log(f"[ROUTER] Selected {selected['nominator_id']} as router for yellow {yellow_id} "
-                     f"(dist: {selected['distance']:.1f}m, {len(nominations)} candidates)")
-            
-            
-            # Send approval to selected router
-            self.send({
-                'dest': selected['nominator_addr'],
-                'type': 'ROUTER_APPROVAL',
-                'yellow_id': yellow_id,
-                'router_id': selected['nominator_id'],
-                'gui': self.id
-            })
-            
-            # Send rejection to others
-            for nom in nominations:
-                if nom['nominator_id'] != selected['nominator_id']:
-                    self.send({
-                        'dest': nom['nominator_addr'],
-                        'type': 'ROUTER_REJECTION',
-                        'yellow_id': yellow_id,
-                        'gui': self.id
-                    })
-
-            
-            # Lock stays set until ROUTER_PROMOTION_COMPLETE or cancellation
-            self.log(f"[CH] Waiting for router promotion to complete for yellow {yellow_id}")
-        
-        elif name == 'TIMER_ROUTER_HB':  # ROUTER sends heartbeat to maintain links
-            if self.role == Roles.ROUTER and ENABLE_ROUTER_LAYER:
-                # Send ROUTER_HEARTBEAT to all connected CHs
-                for ch_item in self.connected_CHs:
-                    for node in sim.nodes:
-                        # Compare by node ID
-                        node_matches = False
-                        if isinstance(ch_item, int):
-                            node_matches = (node.id == ch_item)
-                        elif hasattr(ch_item, 'node_addr'):
-                            node_matches = (node.id == ch_item.node_addr)
-                        
-                        if node_matches and hasattr(node, 'ch_addr'):
-                            self.send({
-                                'dest': node.ch_addr,
-                                'type': 'ROUTER_HEARTBEAT',
-                                'router_id': self.id,
-                                'router_addr': self.addr,
-                                'connected_CHs': self.connected_CHs,
-                                'gui': self.id
-                            })
-                            break
-                self.set_timer('TIMER_ROUTER_HB', ROUTER_HEARTBEAT_INTERVAL)
-        
-        elif name == 'TIMER_SENSOR':
-            self.route_and_forward_package({'dest': self.root_addr, 'type': 'SENSOR', 'source': self.addr, 'sensor_value': random.uniform(10,50)})
-            timer_duration =  self.id % 20
-            if timer_duration == 0: timer_duration = 1
-            self.set_timer('TIMER_SENSOR', timer_duration)
-        
-        elif name == 'TIMER_EXPORT_CH_CSV':
-            # Only root should drive exports (cheap guard)
-            if self.role == Roles.ROOT:
-                # REMOVED: Periodic CSV exports during simulation
-                # Only export 3 essential tables at end
-                pass
     
     ###################
     def is_node_registered(self, node_id):
@@ -1361,17 +1126,6 @@ class SensorNode(wsn.Node):
 
 
 ROOT_ID = random.randrange(config.SIM_NODE_COUNT)  # 0..count-1
-
-
-
-# ============================================================================
-# REMOVED: Unnecessary CSV exports (keeping only 3 essential tables)
-# - write_node_distances_csv
-# - write_node_distance_matrix_csv  
-# - write_clusterhead_distances_csv
-# - write_neighbor_distances_csv
-# - write_routing_statistics_csv
-# ============================================================================
 
 
 def write_child_networks_table_csv(path="child_networks_table.csv"):
@@ -1488,25 +1242,36 @@ sim = wsn.Simulator(
 create_network(SensorNode, config.SIM_NODE_COUNT)
 
 # Function to export 3 essential CSV tables (called on exit or Ctrl+C)
+# Global flag to prevent duplicate exports
+_stats_exported = False
+
 def export_final_stats():
-    """Export 3 essential network structure tables"""
+    """Export 3 essential network structure tables (only once)"""
+    global _stats_exported
+    
+    # Prevent duplicate exports
+    if _stats_exported:
+        return
+    
+    _stats_exported = True
+    
     try:
-        print("\n📊 Exporting network structure...")
+        print("\nExporting network structure...")
         write_child_networks_table_csv("child_networks_table.csv")
         write_members_table_csv("members_table.csv")
         write_neighbors_table_csv("neighbors_table.csv")
-        print("✓ Exported: child_networks_table.csv")
-        print("✓ Exported: members_table.csv")
-        print("✓ Exported: neighbors_table.csv")
+        print("Exported: child_networks_table.csv")
+        print("Exported: members_table.csv")
+        print("Exported: neighbors_table.csv")
     except Exception as e:
-        print(f"✗ Error exporting tables: {e}")
+        print(f"Error exporting tables: {e}")
 
 # Register cleanup handlers
 atexit.register(export_final_stats)
 
 def signal_handler(sig, frame):
     """Handle Ctrl+C gracefully"""
-    print("\n\n⚠️  Simulation stopped by user (Ctrl+C)")
+    print("\n\nSimulation stopped by user (Ctrl+C)")
     export_final_stats()
     sys.exit(0)
 
@@ -1545,22 +1310,20 @@ sys.stderr = tee_logger
 # start the simulation
 try:
     print("=" * 80)
-    print("SIMULATION LOG - V1")
-    print("=" * 80)
-    print("Starting simulation...")
+    print("SIMULATION LOG")
     print(f"Duration: {config.SIM_DURATION}s, Nodes: {config.SIM_NODE_COUNT}")
     print(f"Log file: simulation_log.txt")
     print("=" * 80)
     sim.run()
-    print("\n✓ Simulation completed!")
+    print("\nSimulation completed!")
     import time
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
     export_final_stats()
-    print("\n⚠️  Simulation stopped by user (Ctrl+C)")
+    print("\nSimulation stopped by user (Ctrl+C)")
 except Exception as e:
-    print(f"\n✗ Simulation error: {e}")
+    print(f"\nSimulation error: {e}")
     import traceback
     traceback.print_exc()
 finally:
@@ -1568,4 +1331,4 @@ finally:
     sys.stdout = original_stdout
     sys.stderr = original_stderr
     tee_logger.close()
-    print("✓ Log saved to simulation_log.txt")
+    print("Log saved to simulation_log.txt")

@@ -859,7 +859,7 @@ class SensorNode(wsn.Node):
                         'distance': distance,
                         'timestamp': timestamp
                     })
-                    
+                
                     self.log(f"[CH] Received nomination from {nominator_id} for yellow {yellow_id} (dist: {distance:.1f}m, total: {len(self.pending_nominations[yellow_id])})")
             
             if pck['type'] == 'YELLOW_JOINED_CH':
