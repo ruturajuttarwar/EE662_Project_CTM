@@ -22,8 +22,6 @@ NODE_POS = {}  # {node_id: (x, y)}
 ROLE_COUNTS = Counter()  # live tally per Roles enum
 
 
-
-
 Roles = Enum('Roles', 'UNDISCOVERED UNREGISTERED ROOT REGISTERED CLUSTER_HEAD ROUTER')
 """Enumeration of roles"""
 
@@ -108,6 +106,7 @@ class SensorNode(wsn.Node):
         self.pending_nominations = {}
         self.nomination_timers = {}
         self.active_router_promotion = False
+        self.yellows_being_promoted = set()  # Track which yellows are currently in promotion
         self.cancelled_promotions = set()  # Track cancelled promotions (for greens)
         
         # Multi-Hop Neighbor Discovery
@@ -752,8 +751,10 @@ class SensorNode(wsn.Node):
                     yellow_id = pck['yellow_id']
                     green_id = pck['green_id']
                     green_addr = pck['green_addr']
-                    
-                    
+                    if yellow_id in self.yellows_being_promoted:
+                        self.log(f"[CH] Yellow {yellow_id} already in promotion, ignoring duplicate from green {green_id}")
+                        return
+                        
                     # Check lock - only ONE promotion at a time
                     if self.active_router_promotion:
                         self.log(f"[CH] Promotion in progress, rejecting yellow {yellow_id}")
@@ -768,7 +769,9 @@ class SensorNode(wsn.Node):
                         return
                     
                     # Approve immediately!
+                    self.yellows_being_promoted.add(yellow_id)
                     self.active_router_promotion = True
+                    self.set_timer('TIMER_PROMOTION_LOCK_TIMEOUT', 2)
                     self.log(f"[CH] Approving: yellow {yellow_id} → CH, green {green_id}")
                     
                     # Allocate address
@@ -786,7 +789,8 @@ class SensorNode(wsn.Node):
                         'hop_count': self.hop_count + 1,
                         'gui': self.id
                     })
-                    self.active_router_promotion = False
+                    #self.set_timer('TIMER_PROMOTION_TIMEOUT', 5.0)  # Release after 5s if stuck
+                    #self.active_router_promotion = False
                 return
 
             
@@ -797,6 +801,18 @@ class SensorNode(wsn.Node):
             if pck['type'] == 'PROBE':
                 self.log(f"[HEARTBEAT] Received PROBE, sending HEARTBEAT response")
                 self.send_heart_beat()
+            if pck['type'] == 'PROMOTION_COMPLETE_EARLY':
+                # Yellow became CH and notified us early
+                yellow_id = pck.get('yellow_id')
+                
+                if yellow_id in self.yellows_being_promoted:
+                    self.yellows_being_promoted.discard(yellow_id)
+                    self.log(f"[CH] Yellow {yellow_id} became CH, releasing lock early")
+                
+                # Release lock and cancel timeout
+                self.active_router_promotion = False
+                self.kill_timer('TIMER_PROMOTION_LOCK_TIMEOUT')
+                return
             if pck['type'] == 'JOIN_REQUEST':  # REGISTERED node receives JOIN_REQUEST
                 yellow_id = pck['gui']
                 # Calculate distance to yellow
@@ -809,7 +825,7 @@ class SensorNode(wsn.Node):
                 if parent_addr:
                     self.send({
                         'dest': parent_addr,
-                        'type': 'NETWORK_REQUEST',  # ← Changed!
+                        'type': 'NETWORK_REQUEST',  
                         'yellow_id': yellow_id,
                         'green_id': self.id,
                         'green_addr': self.addr,
@@ -863,7 +879,7 @@ class SensorNode(wsn.Node):
                     # Normal CH promotion (existing logic)
                     self.set_role(Roles.CLUSTER_HEAD)
                     self.scene.nodecolor(self.id, 0, 0, 1)
-                    self.ch_addr = pck['addr']
+                    self.ch_addr = pck['new_ch_addr']
                     self.cluster_size = 0  # Initialize cluster size
                     # hop_count stays the same as when REGISTERED (already set from JOIN_REPLY)
                     self.send_network_update()
@@ -876,7 +892,8 @@ class SensorNode(wsn.Node):
                         self.send_join_reply(gui, wsn.Addr(self.ch_addr.net_addr,gui))
                     
                     self.log(f"Became CH: sent {len(self.received_JR_guis)} join replies")
-                    self.active_router_promotion = False
+                    # Lock released in BECOME_CH handler instead
+                    # self.active_router_promotion = False
         
         elif self.role == Roles.ROUTER:  # if the node is a router
             if pck['type'] == 'HEART_BEAT':
@@ -980,7 +997,8 @@ class SensorNode(wsn.Node):
                     self.set_timer('TIMER_HEART_BEAT', config.HEARTH_BEAT_TIME_INTERVAL)
                     
                     self.log(f"[ROUTER] Became CH (promoted by router {router_id})")
-                    self.active_router_promotion = False
+                    self.send_network_update()
+        
                     
             if pck['type'] == 'JOIN_REPLY':  # it becomes registered and sends join ack if the message is sent to itself once received join reply
                 if pck['dest_gui'] == self.id:
@@ -1045,6 +1063,17 @@ class SensorNode(wsn.Node):
                 else:  # otherwise it keeps trying to sending probe after a long time
                     self.c_probe = 0
                     self.set_timer('TIMER_PROBE', 30)
+
+        elif name == 'TIMER_PROMOTION_LOCK_TIMEOUT':
+            # Auto-release promotion lock after timeout
+            if self.active_router_promotion:
+                self.log(f"[CH] Promotion lock timeout, releasing lock")
+                self.active_router_promotion = False
+                # Clear any stuck yellows from set
+                if hasattr(self, 'yellows_being_promoted'):
+                    if len(self.yellows_being_promoted) > 0:
+                        self.log(f"[CH] Clearing stuck yellows: {self.yellows_being_promoted}")
+                    self.yellows_being_promoted.clear()            
 
         elif name == 'TIMER_HEART_BEAT':  # it sends heart beat message once heart beat timer fired
             # Log heartbeat for REGISTERED nodes to debug yellow discovery issues
