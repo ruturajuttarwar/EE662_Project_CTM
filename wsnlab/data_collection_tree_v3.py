@@ -11,9 +11,6 @@ import atexit
 import csv
 import numpy as np
 
-NETWORK_SEED = 42
-random.seed(NETWORK_SEED)
-np.random.seed(NETWORK_SEED)
 
 # Track where each node is placed
 NODE_POS = {}  # {node_id: (x, y)}
@@ -155,7 +152,7 @@ class SensorNode(wsn.Node):
                 self.scene.nodecolor(self.id, 0, 0, 0)
                 self.set_timer('TIMER_EXPORT_CH_CSV', config.EXPORT_CH_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_NEIGHBOR_CSV', config.EXPORT_NEIGHBOR_CSV_INTERVAL)
-                self.set_timer('TIMER_EXPORT_ROUTING_STATS', 1000)  # Export routing stats periodically
+                self.set_timer('TIMER_EXPORT_ROUTING_STATS', 2000)  # Export routing stats periodically
                 self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance at 4000s
 
 
@@ -1052,6 +1049,20 @@ class SensorNode(wsn.Node):
                     
             if pck['type'] == 'JOIN_REPLY':  # it becomes registered and sends join ack if the message is sent to itself once received join reply
                 if pck['dest_gui'] == self.id:
+                    # VALIDATION: Check if sender is a ROUTER (invalid - greens should only join CHs)
+                    sender_gui = pck['gui']
+                    sender_is_router = False
+                    for node in sim.nodes:
+                        if node.id == sender_gui and hasattr(node, 'role'):
+                            if node.role == Roles.ROUTER:
+                                sender_is_router = True
+                                self.log(f"[JOIN] REJECTED JOIN_REPLY from ROUTER {sender_gui} - greens cannot join routers!")
+                                break
+                    
+                    # Reject JOIN_REPLY from routers
+                    if sender_is_router:
+                        return  # Ignore this JOIN_REPLY
+                    
                     self.addr = pck['addr']
                     self.parent_gui = pck['gui']
                     self.root_addr = pck['root_addr']
@@ -1203,6 +1214,19 @@ class SensorNode(wsn.Node):
         killed_greens = []
         demoted_routers = []
         
+        # Diagnostic: Log all registered nodes and their parents
+        self.log(f"[MAINTENANCE] Diagnostic: Current registered nodes and their parents:")
+        for green in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.REGISTERED]:
+            parent_info = "None"
+            if hasattr(green, 'parent_gui') and green.parent_gui is not None:
+                parent = next((n for n in sim.nodes if n.id == green.parent_gui), None)
+                if parent and hasattr(parent, 'role'):
+                    parent_info = f"{green.parent_gui} ({parent.role.name})"
+                else:
+                    parent_info = f"{green.parent_gui} (NOT FOUND)"
+            self.log(f"  Green {green.id}: parent_gui={parent_info}")
+        self.log("")
+        
         # Phase 1: Find and kill stuck yellows (any yellow stuck > 1000s)
         self.log(f"[MAINTENANCE] Phase 1: Identifying stuck yellows...")
         
@@ -1246,12 +1270,52 @@ class SensorNode(wsn.Node):
         self.log(f"\n[MAINTENANCE] Phase 1c: Identifying greens connected to routers...")
         
         for green in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.REGISTERED]:
-            # Check if green's parent is a ROUTER (not a CH)
+            should_kill = False
+            router_id = None
+            
+            # Method 1: Check if green's parent_gui is a ROUTER
             if hasattr(green, 'parent_gui') and green.parent_gui is not None:
                 parent = next((n for n in sim.nodes if n.id == green.parent_gui), None)
                 if parent and hasattr(parent, 'role') and parent.role == Roles.ROUTER:
-                    # Green is connected to a router - this is invalid
-                    self.log(f"[MAINTENANCE] Found green {green.id} connected to router {parent.id}")
+                    should_kill = True
+                    router_id = parent.id
+                    self.log(f"[MAINTENANCE] Found green {green.id} with parent_gui={router_id} (ROUTER)")
+            
+            # Method 2: Check if green is in any router's members (shouldn't be)
+            if not should_kill:
+                for router in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.ROUTER]:
+                    # Check if this green is connected to this router
+                    if hasattr(router, 'neighbors_table') and green.id in router.neighbors_table:
+                        # Check if green considers router as parent
+                        if hasattr(green, 'ch_addr') and hasattr(router, 'addr'):
+                            if green.ch_addr == router.addr:
+                                should_kill = True
+                                router_id = router.id
+                                self.log(f"[MAINTENANCE] Found green {green.id} with ch_addr pointing to router {router_id}")
+                                break
+            
+            if should_kill and green.id not in killed_greens:
+                killed_greens.append(green.id)
+                
+                # Mark node as killed
+                green.set_role(Roles.UNDISCOVERED)
+                
+                # Stop timers
+                green.kill_timer('TIMER_HEART_BEAT')
+                
+                self.log(f"[MAINTENANCE] Killed green {green.id} (connected to router {router_id})")
+        
+        # Phase 1d: Find and kill greens connected to other greens (invalid green-to-green)
+        self.log(f"\n[MAINTENANCE] Phase 1d: Identifying greens connected to other greens...")
+        
+        for green in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.REGISTERED]:
+            # Check if green's parent is another REGISTERED node (not a CH)
+            if hasattr(green, 'parent_gui') and green.parent_gui is not None:
+                parent = next((n for n in sim.nodes if n.id == green.parent_gui), None)
+                if parent and hasattr(parent, 'role') and parent.role == Roles.REGISTERED:
+                    # Green is connected to another green - this is invalid
+                    # Greens should only connect to CHs, not other greens
+                    self.log(f"[MAINTENANCE] Found green {green.id} connected to green {parent.id}")
                     
                     if green.id not in killed_greens:  # Don't double-kill
                         killed_greens.append(green.id)
@@ -1262,7 +1326,7 @@ class SensorNode(wsn.Node):
                         # Stop timers
                         green.kill_timer('TIMER_HEART_BEAT')
                         
-                        self.log(f"[MAINTENANCE] Killed green {green.id} (connected to router)")
+                        self.log(f"[MAINTENANCE] Killed green {green.id} (connected to green)")
         
         # Phase 2: Demote orphaned routers
         self.log(f"\n[MAINTENANCE] Phase 2: Identifying orphaned routers...")
