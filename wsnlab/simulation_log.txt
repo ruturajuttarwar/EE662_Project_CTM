@@ -8,6 +8,11 @@ Node #71 [  46.29110] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
 Node #72 [  46.29113] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
 Node #80 [  46.29113] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
 Node #70 [  46.29114] [JOIN] Selecting ROOT 81 (hop=0) - no greens available
+Node #81 [  46.29115] [CH] Added 82 to members_table (direct join)
+Node #81 [  46.29116] [CH] Added 71 to members_table (direct join)
+Node #81 [  46.29121] [CH] Added 72 to members_table (direct join)
+Node #81 [  46.29121] [CH] Added 80 to members_table (direct join)
+Node #81 [  46.29122] [CH] Added 70 to members_table (direct join)
 Node #72 [  46.29135] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #82 [  46.29139] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #82 [  46.29140] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -19,6 +24,7 @@ Node #90 [  76.29137] [JOIN] Selecting REGISTERED 80 (dist=81.2m) - direct to gr
 Node #82 [  76.29139] [GREEN] Requesting promotion for yellow 92
 Node #82 [  76.29140] [GREEN] Requesting promotion for yellow 73
 Node #81 [  76.29143] [CH] Approving: yellow 73 → CH, green 72
+Node #81 [  76.29143] [CH] Pre-added child CH 73 with network 73
 Node #80 [  76.29144] [GREEN] Requesting promotion for yellow 90
 Node #81 [  76.29144] [CH] Promotion in progress, rejecting yellow 92
 Node #81 [  76.29144] [CH] Yellow 73 already in promotion, ignoring duplicate from green 82
@@ -27,6 +33,8 @@ Node #72 [  76.29151] [ROUTER] Promoted to ROUTER, bridging CHs [81,254] and 73
 Node #81 [  76.29152] [CH] Promotion in progress, rejecting yellow 90
 Node #73 [  76.29157] [ROUTER] Received BECOME_CH from router 72, promoting to CH
 Node #73 [  76.29157] [ROUTER] Became CH (promoted by router 72)
+Node #73 [  76.29157] [CH] Notified parent 72 about CH creation
+Node #72 [  76.29163] [CH] Added child CH 73 (network 73) via router 72
 Node #81 [  78.29143] [CH] Promotion lock timeout, releasing lock
 Node #81 [  78.29143] [CH] Clearing stuck yellows: {73}
 Node #92 [  91.29130] [JOIN] Selecting REGISTERED 82 (dist=99.9m) - direct to green
@@ -34,16 +42,20 @@ Node #90 [  91.29137] [JOIN] Selecting REGISTERED 80 (dist=81.2m) - direct to gr
 Node #82 [  91.29139] [GREEN] Requesting promotion for yellow 92
 Node #80 [  91.29144] [GREEN] Requesting promotion for yellow 90
 Node #81 [  91.29144] [CH] Approving: yellow 92 → CH, green 82
+Node #81 [  91.29144] [CH] Pre-added child CH 92 with network 92
 Node #82 [  91.29149] [ROUTER] Received router promotion approval for yellow 92
 Node #82 [  91.29149] [ROUTER] Promoted to ROUTER, bridging CHs [81,254] and 92
 Node #81 [  91.29152] [CH] Promotion in progress, rejecting yellow 90
 Node #92 [  91.29159] [ROUTER] Received BECOME_CH from router 82, promoting to CH
 Node #92 [  91.29159] [ROUTER] Became CH (promoted by router 82)
+Node #92 [  91.29159] [CH] Notified parent 82 about CH creation
+Node #82 [  91.29169] [CH] Added child CH 92 (network 92) via router 82
 Node #81 [  93.29144] [CH] Promotion lock timeout, releasing lock
 Node #81 [  93.29144] [CH] Clearing stuck yellows: {92}
 Node #90 [ 106.29137] [JOIN] Selecting REGISTERED 80 (dist=81.2m) - direct to green
 Node #80 [ 106.29144] [GREEN] Requesting promotion for yellow 90
 Node #81 [ 106.29152] [CH] Approving: yellow 90 → CH, green 80
+Node #81 [ 106.29152] [CH] Pre-added child CH 90 with network 90
 Node #80 [ 106.29160] [ROUTER] Received router promotion approval for yellow 90
 Node #80 [ 106.29160] [ROUTER] Promoted to ROUTER, bridging CHs [81,254] and 90
 Node #63 [ 106.29165] [JOIN] Selecting CLUSTER_HEAD 73 (hop=2) - no greens available
@@ -52,6 +64,12 @@ Node #74 [ 106.29166] [JOIN] Selecting CLUSTER_HEAD 73 (hop=2) - no greens avail
 Node #83 [ 106.29167] [JOIN] Selecting CLUSTER_HEAD 73 (hop=2) - no greens available
 Node #90 [ 106.29167] [ROUTER] Received BECOME_CH from router 80, promoting to CH
 Node #90 [ 106.29167] [ROUTER] Became CH (promoted by router 80)
+Node #90 [ 106.29167] [CH] Notified parent 80 about CH creation
+Node #73 [ 106.29173] [CH] Added 63 to members_table (direct join)
+Node #73 [ 106.29174] [CH] Added 64 to members_table (direct join)
+Node #80 [ 106.29174] [CH] Added child CH 90 (network 90) via router 80
+Node #73 [ 106.29175] [CH] Added 74 to members_table (direct join)
+Node #73 [ 106.29176] [CH] Added 83 to members_table (direct join)
 Node #63 [ 106.29196] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #74 [ 106.29197] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #83 [ 106.29197] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -63,6 +81,8 @@ Node #81 [ 108.29152] [CH] Promotion lock timeout, releasing lock
 Node #81 [ 108.29152] [CH] Clearing stuck yellows: {90}
 Node #91 [ 121.29166] [JOIN] Selecting CLUSTER_HEAD 90 (hop=2) - no greens available
 Node #93 [ 121.29168] [JOIN] Selecting CLUSTER_HEAD 92 (hop=2) - no greens available
+Node #90 [ 121.29171] [CH] Added 91 to members_table (direct join)
+Node #92 [ 121.29176] [CH] Added 93 to members_table (direct join)
 Node #93 [ 121.29203] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #62 [ 136.29188] [JOIN] Selecting REGISTERED 63 (dist=98.0m) - direct to green
 Node #53 [ 136.29189] [JOIN] Selecting REGISTERED 63 (dist=98.0m) - direct to green
@@ -77,6 +97,7 @@ Node #63 [ 136.29198] [GREEN] Requesting promotion for yellow 53
 Node #74 [ 136.29198] [GREEN] Requesting promotion for yellow 84
 Node #63 [ 136.29200] [GREEN] Requesting promotion for yellow 54
 Node #73 [ 136.29204] [CH] Approving: yellow 62 → CH, green 63
+Node #73 [ 136.29204] [CH] Pre-added child CH 62 with network 62
 Node #73 [ 136.29205] [CH] Promotion in progress, rejecting yellow 65
 Node #73 [ 136.29206] [CH] Promotion in progress, rejecting yellow 65
 Node #73 [ 136.29206] [CH] Promotion in progress, rejecting yellow 53
@@ -87,6 +108,8 @@ Node #63 [ 136.29212] [ROUTER] Received router promotion approval for yellow 62
 Node #63 [ 136.29212] [ROUTER] Promoted to ROUTER, bridging CHs [73,254] and 62
 Node #62 [ 136.29219] [ROUTER] Received BECOME_CH from router 63, promoting to CH
 Node #62 [ 136.29219] [ROUTER] Became CH (promoted by router 63)
+Node #62 [ 136.29219] [CH] Notified parent 63 about CH creation
+Node #63 [ 136.29227] [CH] Added child CH 62 (network 62) via router 63
 Node #73 [ 138.29204] [CH] Promotion lock timeout, releasing lock
 Node #73 [ 138.29204] [CH] Clearing stuck yellows: {62}
 Node #53 [ 151.29189] [JOIN] Selecting ROUTER 63 (hop=3)
@@ -97,13 +120,17 @@ Node #94 [ 151.29194] [JOIN] Selecting REGISTERED 93 (dist=92.1m) - direct to gr
 Node #74 [ 151.29197] [GREEN] Requesting promotion for yellow 65
 Node #83 [ 151.29197] [GREEN] Requesting promotion for yellow 84
 Node #64 [ 151.29197] [GREEN] Requesting promotion for yellow 65
+Node #63 [ 151.29198] [CH] Added 53 to members_table (direct join)
 Node #74 [ 151.29198] [GREEN] Requesting promotion for yellow 84
+Node #63 [ 151.29200] [CH] Added 54 to members_table (direct join)
 Node #93 [ 151.29203] [GREEN] Requesting promotion for yellow 94
 Node #73 [ 151.29205] [CH] Approving: yellow 65 → CH, green 74
+Node #73 [ 151.29205] [CH] Pre-added child CH 65 with network 65
 Node #73 [ 151.29206] [CH] Yellow 65 already in promotion, ignoring duplicate from green 64
 Node #73 [ 151.29207] [CH] Promotion in progress, rejecting yellow 84
 Node #73 [ 151.29207] [CH] Promotion in progress, rejecting yellow 84
 Node #92 [ 151.29212] [CH] Approving: yellow 94 → CH, green 93
+Node #92 [ 151.29212] [CH] Pre-added child CH 94 with network 94
 Node #74 [ 151.29214] [ROUTER] Received router promotion approval for yellow 65
 Node #74 [ 151.29214] [ROUTER] Promoted to ROUTER, bridging CHs [73,254] and 65
 Node #53 [ 151.29215] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -114,22 +141,31 @@ Node #93 [ 151.29221] [ROUTER] Received router promotion approval for yellow 94
 Node #93 [ 151.29221] [ROUTER] Promoted to ROUTER, bridging CHs [92,254] and 94
 Node #65 [ 151.29221] [ROUTER] Received BECOME_CH from router 74, promoting to CH
 Node #65 [ 151.29221] [ROUTER] Became CH (promoted by router 74)
+Node #65 [ 151.29221] [CH] Notified parent 74 about CH creation
+Node #74 [ 151.29228] [CH] Added child CH 65 (network 65) via router 74
 Node #54 [ 151.29229] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #94 [ 151.29230] [ROUTER] Received BECOME_CH from router 93, promoting to CH
 Node #94 [ 151.29230] [ROUTER] Became CH (promoted by router 93)
+Node #94 [ 151.29230] [CH] Notified parent 93 about CH creation
+Node #93 [ 151.29239] [CH] Added child CH 94 (network 94) via router 93
 Node #73 [ 153.29205] [CH] Promotion lock timeout, releasing lock
 Node #73 [ 153.29205] [CH] Clearing stuck yellows: {65}
 Node #92 [ 153.29212] [CH] Promotion lock timeout, releasing lock
 Node #92 [ 153.29212] [CH] Clearing stuck yellows: {94}
 Node #84 [ 166.29191] [JOIN] Selecting REGISTERED 83 (dist=97.9m) - direct to green
 Node #83 [ 166.29197] [GREEN] Requesting promotion for yellow 84
+Node #74 [ 166.29198] [CH] Added 84 to members_table (direct join)
 Node #73 [ 166.29207] [CH] Approving: yellow 84 → CH, green 83
+Node #73 [ 166.29207] [CH] Pre-added child CH 84 with network 84
 Node #83 [ 166.29216] [ROUTER] Received router promotion approval for yellow 84
 Node #83 [ 166.29216] [ROUTER] Promoted to ROUTER, bridging CHs [73,254] and 84
 Node #84 [ 166.29220] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #61 [ 166.29224] [JOIN] Selecting CLUSTER_HEAD 62 (hop=4) - no greens available
 Node #52 [ 166.29227] [JOIN] Selecting CLUSTER_HEAD 62 (hop=4) - no greens available
 Node #51 [ 166.29229] [JOIN] Selecting CLUSTER_HEAD 62 (hop=4) - no greens available
+Node #62 [ 166.29229] [CH] Added 61 to members_table (direct join)
+Node #62 [ 166.29235] [CH] Added 52 to members_table (direct join)
+Node #62 [ 166.29239] [CH] Added 51 to members_table (direct join)
 Node #51 [ 166.29249] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #61 [ 166.29250] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #51 [ 166.29257] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -147,7 +183,11 @@ Node #54 [ 181.29219] [GREEN] Requesting promotion for yellow 43
 Node #55 [ 181.29219] [JOIN] Selecting CLUSTER_HEAD 65 (hop=4) - no greens available
 Node #75 [ 181.29228] [JOIN] Selecting CLUSTER_HEAD 65 (hop=4) - no greens available
 Node #66 [ 181.29228] [JOIN] Selecting CLUSTER_HEAD 65 (hop=4) - no greens available
+Node #65 [ 181.29229] [CH] Added 55 to members_table (direct join)
+Node #65 [ 181.29235] [CH] Added 75 to members_table (direct join)
 Node #95 [ 181.29235] [JOIN] Selecting CLUSTER_HEAD 94 (hop=4) - no greens available
+Node #65 [ 181.29235] [CH] Added 66 to members_table (direct join)
+Node #94 [ 181.29241] [CH] Added 95 to members_table (direct join)
 Node #55 [ 181.29252] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #75 [ 181.29253] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #66 [ 181.29253] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -171,6 +211,7 @@ Node #61 [ 196.29250] [GREEN] Requesting promotion for yellow 60
 Node #42 [ 196.29251] [JOIN] Selecting REGISTERED 52 (dist=96.0m) - direct to green
 Node #41 [ 196.29252] [JOIN] Selecting REGISTERED 52 (dist=96.0m) - direct to green
 Node #62 [ 196.29255] [CH] Approving: yellow 60 → CH, green 61
+Node #62 [ 196.29255] [CH] Pre-added child CH 60 with network 60
 Node #50 [ 196.29255] [JOIN] Selecting REGISTERED 51 (dist=97.4m) - direct to green
 Node #51 [ 196.29257] [GREEN] Requesting promotion for yellow 41
 Node #52 [ 196.29258] [GREEN] Requesting promotion for yellow 42
@@ -183,8 +224,10 @@ Node #62 [ 196.29266] [CH] Promotion in progress, rejecting yellow 42
 Node #62 [ 196.29267] [CH] Promotion in progress, rejecting yellow 41
 Node #60 [ 196.29267] [ROUTER] Received BECOME_CH from router 61, promoting to CH
 Node #60 [ 196.29267] [ROUTER] Became CH (promoted by router 61)
+Node #60 [ 196.29267] [CH] Notified parent 61 about CH creation
 Node #62 [ 196.29268] [CH] Promotion in progress, rejecting yellow 41
 Node #62 [ 196.29272] [CH] Promotion in progress, rejecting yellow 50
+Node #61 [ 196.29275] [CH] Added child CH 60 (network 60) via router 61
 Node #62 [ 198.29255] [CH] Promotion lock timeout, releasing lock
 Node #62 [ 198.29255] [CH] Clearing stuck yellows: {60}
 Node #43 [ 211.29211] [JOIN] Selecting REGISTERED 53 (dist=85.8m) - direct to green
@@ -213,9 +256,11 @@ Node #51 [ 211.29257] [GREEN] Requesting promotion for yellow 41
 Node #55 [ 211.29257] [GREEN] Requesting promotion for yellow 56
 Node #52 [ 211.29258] [GREEN] Requesting promotion for yellow 42
 Node #75 [ 211.29258] [GREEN] Requesting promotion for yellow 86
+Node #60 [ 211.29260] [CH] Added 50 to members_table (direct join)
 Node #52 [ 211.29260] [GREEN] Requesting promotion for yellow 41
 Node #66 [ 211.29260] [GREEN] Requesting promotion for yellow 67
 Node #65 [ 211.29260] [CH] Approving: yellow 76 → CH, green 75
+Node #65 [ 211.29260] [CH] Pre-added child CH 76 with network 76
 Node #65 [ 211.29260] [CH] Yellow 76 already in promotion, ignoring duplicate from green 66
 Node #95 [ 211.29261] [GREEN] Requesting promotion for yellow 96
 Node #65 [ 211.29261] [CH] Promotion in progress, rejecting yellow 45
@@ -223,7 +268,9 @@ Node #66 [ 211.29262] [GREEN] Requesting promotion for yellow 77
 Node #65 [ 211.29263] [CH] Promotion in progress, rejecting yellow 56
 Node #65 [ 211.29265] [CH] Promotion in progress, rejecting yellow 86
 Node #62 [ 211.29266] [CH] Approving: yellow 42 → CH, green 52
+Node #62 [ 211.29266] [CH] Pre-added child CH 42 with network 42
 Node #94 [ 211.29266] [CH] Approving: yellow 96 → CH, green 95
+Node #94 [ 211.29266] [CH] Pre-added child CH 96 with network 96
 Node #65 [ 211.29267] [CH] Promotion in progress, rejecting yellow 56
 Node #62 [ 211.29267] [CH] Promotion in progress, rejecting yellow 41
 Node #75 [ 211.29267] [ROUTER] Received router promotion approval for yellow 76
@@ -235,12 +282,18 @@ Node #95 [ 211.29271] [ROUTER] Received router promotion approval for yellow 96
 Node #95 [ 211.29271] [ROUTER] Promoted to ROUTER, bridging CHs [94,254] and 96
 Node #76 [ 211.29273] [ROUTER] Received BECOME_CH from router 75, promoting to CH
 Node #76 [ 211.29273] [ROUTER] Became CH (promoted by router 75)
+Node #76 [ 211.29273] [CH] Notified parent 75 about CH creation
 Node #52 [ 211.29274] [ROUTER] Received router promotion approval for yellow 42
 Node #52 [ 211.29274] [ROUTER] Promoted to ROUTER, bridging CHs [62,254] and 42
+Node #75 [ 211.29278] [CH] Added child CH 76 (network 76) via router 75
 Node #96 [ 211.29279] [ROUTER] Received BECOME_CH from router 95, promoting to CH
 Node #96 [ 211.29279] [ROUTER] Became CH (promoted by router 95)
+Node #96 [ 211.29279] [CH] Notified parent 95 about CH creation
 Node #42 [ 211.29281] [ROUTER] Received BECOME_CH from router 52, promoting to CH
 Node #42 [ 211.29281] [ROUTER] Became CH (promoted by router 52)
+Node #42 [ 211.29281] [CH] Notified parent 52 about CH creation
+Node #95 [ 211.29286] [CH] Added child CH 96 (network 96) via router 95
+Node #52 [ 211.29288] [CH] Added child CH 42 (network 42) via router 52
 Node #65 [ 213.29260] [CH] Promotion lock timeout, releasing lock
 Node #65 [ 213.29260] [CH] Clearing stuck yellows: {76}
 Node #62 [ 213.29266] [CH] Promotion lock timeout, releasing lock
@@ -252,6 +305,7 @@ Node #44 [ 226.29212] [JOIN] Selecting REGISTERED 53 (dist=85.8m) - direct to gr
 Node #85 [ 226.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
 Node #54 [ 226.29217] [GREEN] Requesting promotion for yellow 44
 Node #53 [ 226.29218] [GREEN] Requesting promotion for yellow 44
+Node #42 [ 226.29219] [CH] Added 43 to members_table (direct join)
 Node #84 [ 226.29220] [GREEN] Requesting promotion for yellow 85
 Node #45 [ 226.29245] [JOIN] Selecting REGISTERED 55 (dist=97.6m) - direct to green
 Node #56 [ 226.29248] [JOIN] Selecting REGISTERED 66 (dist=97.5m) - direct to green
@@ -262,17 +316,24 @@ Node #55 [ 226.29252] [GREEN] Requesting promotion for yellow 45
 Node #77 [ 226.29252] [JOIN] Selecting CLUSTER_HEAD 76 (hop=6) - no greens available
 Node #66 [ 226.29256] [GREEN] Requesting promotion for yellow 56
 Node #55 [ 226.29257] [GREEN] Requesting promotion for yellow 56
+Node #76 [ 226.29258] [CH] Added 77 to members_table (direct join)
+Node #76 [ 226.29258] [CH] Added 86 to members_table (direct join)
+Node #76 [ 226.29258] [CH] Added 67 to members_table (direct join)
+Node #42 [ 226.29259] [CH] Added 41 to members_table (direct join)
 Node #65 [ 226.29261] [CH] Approving: yellow 45 → CH, green 55
+Node #65 [ 226.29261] [CH] Pre-added child CH 45 with network 45
 Node #65 [ 226.29263] [CH] Promotion in progress, rejecting yellow 56
 Node #65 [ 226.29267] [CH] Promotion in progress, rejecting yellow 56
 Node #55 [ 226.29270] [ROUTER] Received router promotion approval for yellow 45
 Node #55 [ 226.29270] [ROUTER] Promoted to ROUTER, bridging CHs [65,254] and 45
 Node #45 [ 226.29277] [ROUTER] Received BECOME_CH from router 55, promoting to CH
 Node #45 [ 226.29277] [ROUTER] Became CH (promoted by router 55)
+Node #45 [ 226.29277] [CH] Notified parent 55 about CH creation
 Node #86 [ 226.29279] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #77 [ 226.29280] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #41 [ 226.29281] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #67 [ 226.29282] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
+Node #55 [ 226.29284] [CH] Added child CH 45 (network 45) via router 55
 Node #65 [ 228.29261] [CH] Promotion lock timeout, releasing lock
 Node #65 [ 228.29261] [CH] Clearing stuck yellows: {45}
 Node #44 [ 241.29212] [JOIN] Selecting REGISTERED 43 (dist=80.8m) - direct to green
@@ -280,15 +341,23 @@ Node #85 [ 241.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to gr
 Node #43 [ 241.29219] [GREEN] Requesting promotion for yellow 44
 Node #84 [ 241.29220] [GREEN] Requesting promotion for yellow 85
 Node #42 [ 241.29227] [CH] Approving: yellow 44 → CH, green 43
+Node #42 [ 241.29227] [CH] Pre-added child CH 44 with network 44
 Node #43 [ 241.29235] [ROUTER] Received router promotion approval for yellow 44
 Node #43 [ 241.29235] [ROUTER] Promoted to ROUTER, bridging CHs [42,254] and 44
 Node #44 [ 241.29242] [ROUTER] Received BECOME_CH from router 43, promoting to CH
 Node #44 [ 241.29242] [ROUTER] Became CH (promoted by router 43)
+Node #44 [ 241.29242] [CH] Notified parent 43 about CH creation
 Node #56 [ 241.29248] [JOIN] Selecting CLUSTER_HEAD 45 (hop=6) - no greens available
+Node #43 [ 241.29249] [CH] Added child CH 44 (network 44) via router 43
+Node #45 [ 241.29257] [CH] Added 56 to members_table (direct join)
 Node #32 [ 241.29287] [JOIN] Selecting CLUSTER_HEAD 42 (hop=6) - no greens available
 Node #31 [ 241.29291] [JOIN] Selecting CLUSTER_HEAD 42 (hop=6) - no greens available
 Node #33 [ 241.29291] [JOIN] Selecting CLUSTER_HEAD 42 (hop=6) - no greens available
+Node #42 [ 241.29293] [CH] Added 32 to members_table (direct join)
+Node #43 [ 241.29298] [CH] Added 33 to members_table (direct join)
 Node #41 [ 241.29300] [GREEN] Requesting promotion for yellow 31
+Node #42 [ 241.29300] [CH] Added 31 to members_table (direct join)
+Node #42 [ 241.29300] [CH] Added 33 to members_table (direct join)
 Node #42 [ 241.29307] [CH] Promotion in progress, rejecting yellow 31
 Node #32 [ 241.29311] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #33 [ 241.29324] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -309,10 +378,13 @@ Node #41 [ 256.29281] [GREEN] Requesting promotion for yellow 40
 Node #67 [ 256.29282] [GREEN] Requesting promotion for yellow 57
 Node #46 [ 256.29284] [JOIN] Selecting CLUSTER_HEAD 45 (hop=6) - no greens available
 Node #76 [ 256.29285] [CH] Approving: yellow 87 → CH, green 77
+Node #76 [ 256.29285] [CH] Pre-added child CH 87 with network 87
 Node #76 [ 256.29287] [CH] Yellow 87 already in promotion, ignoring duplicate from green 86
 Node #42 [ 256.29288] [CH] Approving: yellow 40 → CH, green 41
+Node #42 [ 256.29288] [CH] Pre-added child CH 40 with network 40
 Node #76 [ 256.29289] [CH] Promotion in progress, rejecting yellow 57
 Node #42 [ 256.29289] [CH] Yellow 40 already in promotion, ignoring duplicate from green 31
+Node #45 [ 256.29290] [CH] Added 46 to members_table (direct join)
 Node #77 [ 256.29291] [ROUTER] Received router promotion approval for yellow 87
 Node #77 [ 256.29291] [ROUTER] Promoted to ROUTER, bridging CHs [76,254] and 87
 Node #56 [ 256.29293] [GREEN] Requesting promotion for yellow 46
@@ -320,9 +392,14 @@ Node #41 [ 256.29295] [ROUTER] Received router promotion approval for yellow 40
 Node #41 [ 256.29295] [ROUTER] Promoted to ROUTER, bridging CHs [42,254] and 40
 Node #87 [ 256.29299] [ROUTER] Received BECOME_CH from router 77, promoting to CH
 Node #87 [ 256.29299] [ROUTER] Became CH (promoted by router 77)
+Node #87 [ 256.29299] [CH] Notified parent 77 about CH creation
 Node #40 [ 256.29302] [ROUTER] Received BECOME_CH from router 41, promoting to CH
 Node #40 [ 256.29302] [ROUTER] Became CH (promoted by router 41)
+Node #40 [ 256.29302] [CH] Notified parent 41 about CH creation
 Node #45 [ 256.29302] [CH] Approving: yellow 46 → CH, green 56
+Node #45 [ 256.29302] [CH] Pre-added child CH 46 with network 46
+Node #77 [ 256.29308] [CH] Added child CH 87 (network 87) via router 77
+Node #41 [ 256.29309] [CH] Added child CH 40 (network 40) via router 41
 Node #46 [ 256.29310] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #56 [ 256.29312] [ROUTER] Received router promotion approval for yellow 46
 Node #56 [ 256.29312] [ROUTER] Promoted to ROUTER, bridging CHs [45,254] and 46
@@ -337,30 +414,38 @@ Node #45 [ 258.29302] [CH] Clearing stuck yellows: {46}
 Node #85 [ 271.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
 Node #84 [ 271.29220] [GREEN] Requesting promotion for yellow 85
 Node #34 [ 271.29249] [JOIN] Selecting CLUSTER_HEAD 44 (hop=8) - no greens available
+Node #44 [ 271.29255] [CH] Added 34 to members_table (direct join)
 Node #34 [ 271.29273] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #57 [ 271.29274] [JOIN] Selecting REGISTERED 67 (dist=88.0m) - direct to green
 Node #34 [ 271.29282] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #67 [ 271.29282] [GREEN] Requesting promotion for yellow 57
 Node #76 [ 271.29289] [CH] Approving: yellow 57 → CH, green 67
+Node #76 [ 271.29289] [CH] Pre-added child CH 57 with network 57
 Node #67 [ 271.29296] [ROUTER] Received router promotion approval for yellow 57
 Node #67 [ 271.29296] [ROUTER] Promoted to ROUTER, bridging CHs [76,254] and 57
 Node #57 [ 271.29304] [ROUTER] Received BECOME_CH from router 67, promoting to CH
 Node #57 [ 271.29304] [ROUTER] Became CH (promoted by router 67)
+Node #57 [ 271.29304] [CH] Notified parent 67 about CH creation
 Node #22 [ 271.29305] [JOIN] Selecting REGISTERED 32 (dist=63.6m) - direct to green
 Node #32 [ 271.29311] [GREEN] Requesting promotion for yellow 22
+Node #67 [ 271.29313] [CH] Added child CH 57 (network 57) via router 67
 Node #24 [ 271.29314] [JOIN] Selecting REGISTERED 33 (dist=94.5m) - direct to green
 Node #42 [ 271.29317] [CH] Approving: yellow 22 → CH, green 32
+Node #42 [ 271.29317] [CH] Pre-added child CH 22 with network 22
 Node #20 [ 271.29318] [JOIN] Selecting REGISTERED 31 (dist=89.1m) - direct to green
 Node #21 [ 271.29318] [JOIN] Selecting REGISTERED 31 (dist=94.1m) - direct to green
 Node #30 [ 271.29318] [JOIN] Selecting CLUSTER_HEAD 40 (hop=8) - no greens available
 Node #32 [ 271.29323] [ROUTER] Received router promotion approval for yellow 22
 Node #32 [ 271.29323] [ROUTER] Promoted to ROUTER, bridging CHs [42,254] and 22
 Node #33 [ 271.29324] [GREEN] Requesting promotion for yellow 24
+Node #40 [ 271.29327] [CH] Added 30 to members_table (direct join)
 Node #31 [ 271.29327] [GREEN] Requesting promotion for yellow 20
 Node #31 [ 271.29327] [GREEN] Requesting promotion for yellow 21
 Node #22 [ 271.29329] [ROUTER] Received BECOME_CH from router 32, promoting to CH
 Node #22 [ 271.29329] [ROUTER] Became CH (promoted by router 32)
+Node #22 [ 271.29329] [CH] Notified parent 32 about CH creation
 Node #42 [ 271.29333] [CH] Promotion in progress, rejecting yellow 24
+Node #32 [ 271.29335] [CH] Added child CH 22 (network 22) via router 32
 Node #42 [ 271.29337] [CH] Promotion in progress, rejecting yellow 20
 Node #42 [ 271.29337] [CH] Promotion in progress, rejecting yellow 21
 Node #76 [ 273.29289] [CH] Promotion lock timeout, releasing lock
@@ -375,20 +460,28 @@ Node #37 [ 286.29305] [JOIN] Selecting REGISTERED 46 (dist=95.7m) - direct to gr
 Node #97 [ 286.29307] [JOIN] Selecting CLUSTER_HEAD 87 (hop=8) - no greens available
 Node #88 [ 286.29307] [JOIN] Selecting CLUSTER_HEAD 87 (hop=8) - no greens available
 Node #46 [ 286.29313] [GREEN] Requesting promotion for yellow 36
+Node #57 [ 286.29313] [CH] Added 47 to members_table (direct join)
 Node #46 [ 286.29313] [GREEN] Requesting promotion for yellow 37
 Node #24 [ 286.29314] [JOIN] Selecting REGISTERED 33 (dist=94.5m) - direct to green
+Node #87 [ 286.29315] [CH] Added 97 to members_table (direct join)
+Node #87 [ 286.29315] [CH] Added 88 to members_table (direct join)
 Node #20 [ 286.29318] [JOIN] Selecting REGISTERED 30 (dist=91.2m) - direct to green
 Node #21 [ 286.29318] [JOIN] Selecting CLUSTER_HEAD 22 (hop=8) - no greens available
 Node #45 [ 286.29319] [CH] Approving: yellow 36 → CH, green 46
+Node #45 [ 286.29319] [CH] Pre-added child CH 36 with network 36
 Node #45 [ 286.29320] [CH] Promotion in progress, rejecting yellow 37
 Node #30 [ 286.29323] [GREEN] Requesting promotion for yellow 20
 Node #33 [ 286.29324] [GREEN] Requesting promotion for yellow 24
 Node #46 [ 286.29326] [ROUTER] Received router promotion approval for yellow 36
 Node #46 [ 286.29326] [ROUTER] Promoted to ROUTER, bridging CHs [45,254] and 36
+Node #22 [ 286.29327] [CH] Added 21 to members_table (direct join)
 Node #40 [ 286.29331] [CH] Approving: yellow 20 → CH, green 30
+Node #40 [ 286.29331] [CH] Pre-added child CH 20 with network 20
 Node #42 [ 286.29333] [CH] Approving: yellow 24 → CH, green 33
+Node #42 [ 286.29333] [CH] Pre-added child CH 24 with network 24
 Node #36 [ 286.29334] [ROUTER] Received BECOME_CH from router 46, promoting to CH
 Node #36 [ 286.29334] [ROUTER] Became CH (promoted by router 46)
+Node #36 [ 286.29334] [CH] Notified parent 46 about CH creation
 Node #97 [ 286.29335] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #88 [ 286.29336] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #30 [ 286.29340] [ROUTER] Received router promotion approval for yellow 20
@@ -396,13 +489,18 @@ Node #30 [ 286.29340] [ROUTER] Promoted to ROUTER, bridging CHs [40,254] and 20
 Node #88 [ 286.29340] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #88 [ 286.29341] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #88 [ 286.29341] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
+Node #46 [ 286.29342] [CH] Added child CH 36 (network 36) via router 46
 Node #33 [ 286.29343] [ROUTER] Received router promotion approval for yellow 24
 Node #33 [ 286.29343] [ROUTER] Promoted to ROUTER, bridging CHs [42,254] and 24
 Node #20 [ 286.29344] [ROUTER] Received BECOME_CH from router 30, promoting to CH
 Node #20 [ 286.29344] [ROUTER] Became CH (promoted by router 30)
+Node #20 [ 286.29344] [CH] Notified parent 30 about CH creation
 Node #21 [ 286.29346] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
+Node #30 [ 286.29349] [CH] Added child CH 20 (network 20) via router 30
 Node #24 [ 286.29352] [ROUTER] Received BECOME_CH from router 33, promoting to CH
 Node #24 [ 286.29352] [ROUTER] Became CH (promoted by router 33)
+Node #24 [ 286.29352] [CH] Notified parent 33 about CH creation
+Node #33 [ 286.29361] [CH] Added child CH 24 (network 24) via router 33
 Node #45 [ 288.29319] [CH] Promotion lock timeout, releasing lock
 Node #45 [ 288.29319] [CH] Clearing stuck yellows: {36}
 Node #40 [ 288.29331] [CH] Promotion lock timeout, releasing lock
@@ -413,10 +511,14 @@ Node #85 [ 301.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to gr
 Node #84 [ 301.29220] [GREEN] Requesting promotion for yellow 85
 Node #35 [ 301.29268] [JOIN] Selecting CLUSTER_HEAD 36 (hop=8) - no greens available
 Node #25 [ 301.29272] [JOIN] Selecting CLUSTER_HEAD 36 (hop=8) - no greens available
+Node #36 [ 301.29278] [CH] Added 35 to members_table (direct join)
+Node #36 [ 301.29281] [CH] Added 25 to members_table (direct join)
 Node #25 [ 301.29305] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #37 [ 301.29305] [JOIN] Selecting CLUSTER_HEAD 36 (hop=8) - no greens available
 Node #25 [ 301.29307] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #58 [ 301.29311] [JOIN] Selecting CLUSTER_HEAD 57 (hop=8) - no greens available
+Node #36 [ 301.29315] [CH] Added 37 to members_table (direct join)
+Node #57 [ 301.29318] [CH] Added 58 to members_table (direct join)
 Node #58 [ 301.29337] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #12 [ 301.29337] [JOIN] Selecting CLUSTER_HEAD 22 (hop=8) - no greens available
 Node #23 [ 301.29338] [JOIN] Selecting CLUSTER_HEAD 22 (hop=8) - no greens available
@@ -424,8 +526,11 @@ Node #37 [ 301.29339] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #58 [ 301.29342] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #58 [ 301.29343] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #58 [ 301.29345] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
+Node #22 [ 301.29346] [CH] Added 12 to members_table (direct join)
+Node #22 [ 301.29346] [CH] Added 23 to members_table (direct join)
 Node #21 [ 301.29347] [GREEN] Requesting promotion for yellow 12
 Node #22 [ 301.29355] [CH] Approving: yellow 12 → CH, green 21
+Node #22 [ 301.29355] [CH] Pre-added child CH 12 with network 12
 Node #12 [ 301.29362] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #21 [ 301.29364] [ROUTER] Received router promotion approval for yellow 12
 Node #21 [ 301.29364] [ROUTER] Promoted to ROUTER, bridging CHs [22,254] and 12
@@ -448,21 +553,29 @@ Node #11 [ 316.29341] [JOIN] Selecting CLUSTER_HEAD 20 (hop=10) - no greens avai
 Node #26 [ 316.29341] [JOIN] Selecting CLUSTER_HEAD 36 (hop=8) - no greens available
 Node #88 [ 316.29341] [GREEN] Requesting promotion for yellow 79
 Node #87 [ 316.29343] [CH] Approving: yellow 98 → CH, green 97
+Node #87 [ 316.29343] [CH] Pre-added child CH 98 with network 98
 Node #87 [ 316.29344] [CH] Yellow 98 already in promotion, ignoring duplicate from green 88
+Node #36 [ 316.29347] [CH] Added 27 to members_table (direct join)
+Node #36 [ 316.29348] [CH] Added 26 to members_table (direct join)
 Node #87 [ 316.29348] [CH] Promotion in progress, rejecting yellow 78
 Node #87 [ 316.29349] [CH] Promotion in progress, rejecting yellow 89
 Node #87 [ 316.29349] [CH] Promotion in progress, rejecting yellow 79
+Node #20 [ 316.29349] [CH] Added 11 to members_table (direct join)
 Node #25 [ 316.29349] [GREEN] Requesting promotion for yellow 26
 Node #37 [ 316.29350] [GREEN] Requesting promotion for yellow 27
 Node #97 [ 316.29351] [ROUTER] Received router promotion approval for yellow 98
 Node #97 [ 316.29351] [ROUTER] Promoted to ROUTER, bridging CHs [87,254] and 98
 Node #98 [ 316.29358] [ROUTER] Received BECOME_CH from router 97, promoting to CH
 Node #98 [ 316.29358] [ROUTER] Became CH (promoted by router 97)
+Node #98 [ 316.29358] [CH] Notified parent 97 about CH creation
 Node #36 [ 316.29358] [CH] Approving: yellow 26 → CH, green 25
+Node #36 [ 316.29358] [CH] Pre-added child CH 26 with network 26
 Node #36 [ 316.29359] [CH] Promotion in progress, rejecting yellow 27
 Node #14 [ 316.29360] [JOIN] Selecting CLUSTER_HEAD 24 (hop=9) - no greens available
+Node #97 [ 316.29364] [CH] Added child CH 98 (network 98) via router 97
 Node #25 [ 316.29367] [ROUTER] Received router promotion approval for yellow 26
 Node #25 [ 316.29367] [ROUTER] Promoted to ROUTER, bridging CHs [36,254] and 26
+Node #24 [ 316.29368] [CH] Added 14 to members_table (direct join)
 Node #27 [ 316.29370] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #26 [ 316.29371] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #11 [ 316.29372] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
@@ -478,14 +591,19 @@ Node #15 [ 331.29297] [JOIN] Selecting REGISTERED 14 (dist=97.9m) - direct to gr
 Node #16 [ 331.29298] [JOIN] Selecting REGISTERED 26 (dist=85.5m) - direct to green
 Node #14 [ 331.29302] [GREEN] Requesting promotion for yellow 15
 Node #26 [ 331.29303] [GREEN] Requesting promotion for yellow 16
+Node #25 [ 331.29307] [CH] Added 16 to members_table (direct join)
 Node #36 [ 331.29310] [CH] Approving: yellow 16 → CH, green 26
+Node #36 [ 331.29310] [CH] Pre-added child CH 16 with network 16
 Node #24 [ 331.29310] [CH] Approving: yellow 15 → CH, green 14
+Node #24 [ 331.29310] [CH] Pre-added child CH 15 with network 15
 Node #26 [ 331.29317] [ROUTER] Received router promotion approval for yellow 16
 Node #26 [ 331.29317] [ROUTER] Promoted to ROUTER, bridging CHs [36,254] and 16
 Node #14 [ 331.29318] [ROUTER] Received router promotion approval for yellow 15
 Node #14 [ 331.29318] [ROUTER] Promoted to ROUTER, bridging CHs [24,254] and 15
 Node #15 [ 331.29323] [ROUTER] Received BECOME_CH from router 14, promoting to CH
 Node #15 [ 331.29323] [ROUTER] Became CH (promoted by router 14)
+Node #15 [ 331.29323] [CH] Notified parent 14 about CH creation
+Node #14 [ 331.29328] [CH] Added child CH 15 (network 15) via router 14
 Node #48 [ 331.29331] [JOIN] Selecting REGISTERED 58 (dist=99.5m) - direct to green
 Node #16 [ 331.29331] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #78 [ 331.29332] [JOIN] Selecting REGISTERED 88 (dist=90.3m) - direct to green
@@ -497,14 +615,17 @@ Node #59 [ 331.29334] [JOIN] Selecting REGISTERED 58 (dist=99.5m) - direct to gr
 Node #69 [ 331.29335] [JOIN] Selecting REGISTERED 58 (dist=99.5m) - direct to green
 Node #58 [ 331.29337] [GREEN] Requesting promotion for yellow 48
 Node #37 [ 331.29339] [GREEN] Requesting promotion for yellow 38
+Node #98 [ 331.29340] [CH] Added 89 to members_table (direct join)
 Node #88 [ 331.29340] [GREEN] Requesting promotion for yellow 78
 Node #88 [ 331.29341] [GREEN] Requesting promotion for yellow 79
 Node #27 [ 331.29342] [GREEN] Requesting promotion for yellow 38
 Node #58 [ 331.29342] [GREEN] Requesting promotion for yellow 68
 Node #58 [ 331.29343] [GREEN] Requesting promotion for yellow 59
 Node #57 [ 331.29344] [CH] Approving: yellow 48 → CH, green 58
+Node #57 [ 331.29344] [CH] Pre-added child CH 48 with network 48
 Node #58 [ 331.29345] [GREEN] Requesting promotion for yellow 69
 Node #87 [ 331.29348] [CH] Approving: yellow 78 → CH, green 88
+Node #87 [ 331.29348] [CH] Pre-added child CH 78 with network 78
 Node #36 [ 331.29348] [CH] Promotion in progress, rejecting yellow 38
 Node #87 [ 331.29349] [CH] Promotion in progress, rejecting yellow 79
 Node #57 [ 331.29349] [CH] Promotion in progress, rejecting yellow 68
@@ -517,20 +638,27 @@ Node #88 [ 331.29356] [ROUTER] Received router promotion approval for yellow 78
 Node #88 [ 331.29356] [ROUTER] Promoted to ROUTER, bridging CHs [87,254] and 78
 Node #48 [ 331.29357] [ROUTER] Received BECOME_CH from router 58, promoting to CH
 Node #48 [ 331.29357] [ROUTER] Became CH (promoted by router 58)
+Node #48 [ 331.29357] [CH] Notified parent 58 about CH creation
 Node #13 [ 331.29358] [JOIN] Selecting REGISTERED 23 (dist=93.8m) - direct to green
 Node #12 [ 331.29362] [GREEN] Requesting promotion for yellow 13
 Node #2  [ 331.29362] [JOIN] Selecting REGISTERED 12 (dist=96.3m) - direct to green
+Node #58 [ 331.29363] [CH] Added child CH 48 (network 48) via router 58
 Node #78 [ 331.29365] [ROUTER] Received BECOME_CH from router 88, promoting to CH
 Node #78 [ 331.29365] [ROUTER] Became CH (promoted by router 88)
+Node #78 [ 331.29365] [CH] Notified parent 88 about CH creation
 Node #23 [ 331.29366] [GREEN] Requesting promotion for yellow 13
 Node #22 [ 331.29370] [CH] Approving: yellow 13 → CH, green 12
+Node #22 [ 331.29370] [CH] Pre-added child CH 13 with network 13
 Node #12 [ 331.29370] [GREEN] Requesting promotion for yellow 2
+Node #88 [ 331.29374] [CH] Added child CH 78 (network 78) via router 88
 Node #22 [ 331.29375] [CH] Yellow 13 already in promotion, ignoring duplicate from green 23
 Node #12 [ 331.29379] [ROUTER] Received router promotion approval for yellow 13
 Node #12 [ 331.29379] [ROUTER] Promoted to ROUTER, bridging CHs [22,254] and 13
 Node #22 [ 331.29379] [CH] Promotion in progress, rejecting yellow 2
 Node #13 [ 331.29382] [ROUTER] Received BECOME_CH from router 12, promoting to CH
 Node #13 [ 331.29382] [ROUTER] Became CH (promoted by router 12)
+Node #13 [ 331.29382] [CH] Notified parent 12 about CH creation
+Node #12 [ 331.29386] [CH] Added child CH 13 (network 13) via router 12
 Node #36 [ 333.29310] [CH] Promotion lock timeout, releasing lock
 Node #36 [ 333.29310] [CH] Clearing stuck yellows: {16}
 Node #24 [ 333.29310] [CH] Promotion lock timeout, releasing lock
@@ -548,9 +676,14 @@ Node #79 [ 346.29332] [JOIN] Selecting CLUSTER_HEAD 78 (hop=10) - no greens avai
 Node #68 [ 346.29333] [JOIN] Selecting CLUSTER_HEAD 78 (hop=10) - no greens available
 Node #59 [ 346.29334] [JOIN] Selecting CLUSTER_HEAD 48 (hop=10) - no greens available
 Node #69 [ 346.29335] [JOIN] Selecting CLUSTER_HEAD 78 (hop=10) - no greens available
+Node #78 [ 346.29335] [CH] Added 79 to members_table (direct join)
 Node #37 [ 346.29339] [GREEN] Requesting promotion for yellow 38
+Node #78 [ 346.29341] [CH] Added 68 to members_table (direct join)
+Node #48 [ 346.29341] [CH] Added 59 to members_table (direct join)
 Node #27 [ 346.29342] [GREEN] Requesting promotion for yellow 38
+Node #78 [ 346.29343] [CH] Added 69 to members_table (direct join)
 Node #36 [ 346.29348] [CH] Approving: yellow 38 → CH, green 27
+Node #36 [ 346.29348] [CH] Pre-added child CH 38 with network 38
 Node #36 [ 346.29349] [CH] Yellow 38 already in promotion, ignoring duplicate from green 37
 Node #27 [ 346.29355] [ROUTER] Received router promotion approval for yellow 38
 Node #27 [ 346.29355] [ROUTER] Promoted to ROUTER, bridging CHs [36,254] and 38
@@ -559,11 +692,19 @@ Node #2  [ 346.29362] [JOIN] Selecting CLUSTER_HEAD 13 (hop=10) - no greens avai
 Node #10 [ 346.29365] [JOIN] Selecting REGISTERED 11 (dist=81.0m) - direct to green
 Node #38 [ 346.29365] [ROUTER] Received BECOME_CH from router 27, promoting to CH
 Node #38 [ 346.29365] [ROUTER] Became CH (promoted by router 27)
+Node #38 [ 346.29365] [CH] Notified parent 27 about CH creation
 Node #99 [ 346.29366] [JOIN] Selecting CLUSTER_HEAD 98 (hop=10) - no greens available
+Node #27 [ 346.29370] [CH] Added 17 to members_table (direct join)
+Node #13 [ 346.29371] [CH] Added 2 to members_table (direct join)
+Node #26 [ 346.29371] [CH] Added 17 to members_table (direct join)
 Node #89 [ 346.29371] [GREEN] Requesting promotion for yellow 99
 Node #11 [ 346.29372] [GREEN] Requesting promotion for yellow 10
+Node #27 [ 346.29375] [CH] Added child CH 38 (network 38) via router 27
+Node #98 [ 346.29375] [CH] Added 99 to members_table (direct join)
 Node #98 [ 346.29379] [CH] Approving: yellow 99 → CH, green 89
+Node #98 [ 346.29379] [CH] Pre-added child CH 99 with network 99
 Node #20 [ 346.29380] [CH] Approving: yellow 10 → CH, green 11
+Node #20 [ 346.29380] [CH] Pre-added child CH 10 with network 10
 Node #4  [ 346.29385] [JOIN] Selecting ROUTER 14 (hop=10)
 Node #5  [ 346.29386] [JOIN] Selecting CLUSTER_HEAD 15 (hop=11) - no greens available
 Node #89 [ 346.29387] [ROUTER] Received router promotion approval for yellow 99
@@ -572,9 +713,13 @@ Node #11 [ 346.29388] [ROUTER] Received router promotion approval for yellow 10
 Node #11 [ 346.29388] [ROUTER] Promoted to ROUTER, bridging CHs [20,254] and 10
 Node #17 [ 346.29393] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #17 [ 346.29394] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
+Node #14 [ 346.29394] [CH] Added 4 to members_table (direct join)
 Node #10 [ 346.29396] [ROUTER] Received BECOME_CH from router 11, promoting to CH
 Node #10 [ 346.29396] [ROUTER] Became CH (promoted by router 11)
+Node #10 [ 346.29396] [CH] Notified parent 11 about CH creation
+Node #15 [ 346.29396] [CH] Added 5 to members_table (direct join)
 Node #17 [ 346.29396] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
+Node #11 [ 346.29404] [CH] Added child CH 10 (network 10) via router 11
 Node #36 [ 348.29348] [CH] Promotion lock timeout, releasing lock
 Node #36 [ 348.29348] [CH] Clearing stuck yellows: {38}
 Node #98 [ 348.29379] [CH] Promotion lock timeout, releasing lock
@@ -588,12 +733,17 @@ Node #16 [ 361.29331] [GREEN] Requesting promotion for yellow 6
 Node #49 [ 361.29363] [JOIN] Selecting CLUSTER_HEAD 48 (hop=10) - no greens available
 Node #39 [ 361.29367] [JOIN] Selecting CLUSTER_HEAD 38 (hop=10) - no greens available
 Node #59 [ 361.29369] [GREEN] Requesting promotion for yellow 49
+Node #48 [ 361.29370] [CH] Added 49 to members_table (direct join)
+Node #38 [ 361.29373] [CH] Added 39 to members_table (direct join)
 Node #48 [ 361.29377] [CH] Approving: yellow 49 → CH, green 59
+Node #48 [ 361.29377] [CH] Pre-added child CH 49 with network 49
 Node #59 [ 361.29384] [ROUTER] Received router promotion approval for yellow 49
 Node #59 [ 361.29384] [ROUTER] Promoted to ROUTER, bridging CHs [48,254] and 49
 Node #3  [ 361.29390] [JOIN] Selecting CLUSTER_HEAD 13 (hop=10) - no greens available
 Node #2  [ 361.29396] [GREEN] Requesting promotion for yellow 3
+Node #13 [ 361.29399] [CH] Added 3 to members_table (direct join)
 Node #13 [ 361.29405] [CH] Approving: yellow 3 → CH, green 2
+Node #13 [ 361.29405] [CH] Pre-added child CH 3 with network 3
 Node #2  [ 361.29413] [ROUTER] Received router promotion approval for yellow 3
 Node #2  [ 361.29413] [ROUTER] Promoted to ROUTER, bridging CHs [13,254] and 3
 Node #48 [ 363.29377] [CH] Promotion lock timeout, releasing lock
@@ -606,11 +756,14 @@ Node #6  [ 376.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to gr
 Node #16 [ 376.29331] [GREEN] Requesting promotion for yellow 6
 Node #28 [ 376.29372] [JOIN] Selecting CLUSTER_HEAD 38 (hop=10) - no greens available
 Node #29 [ 376.29374] [JOIN] Selecting CLUSTER_HEAD 38 (hop=10) - no greens available
+Node #38 [ 376.29378] [CH] Added 28 to members_table (direct join)
 Node #39 [ 376.29381] [GREEN] Requesting promotion for yellow 28
 Node #39 [ 376.29383] [GREEN] Requesting promotion for yellow 29
+Node #38 [ 376.29384] [CH] Added 29 to members_table (direct join)
 Node #18 [ 376.29386] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to green
 Node #8  [ 376.29386] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to green
 Node #38 [ 376.29387] [CH] Approving: yellow 28 → CH, green 39
+Node #38 [ 376.29387] [CH] Pre-added child CH 28 with network 28
 Node #7  [ 376.29387] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to green
 Node #38 [ 376.29389] [CH] Promotion in progress, rejecting yellow 29
 Node #39 [ 376.29393] [ROUTER] Received router promotion approval for yellow 28
@@ -622,6 +775,8 @@ Node #28 [ 376.29402] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #29 [ 376.29402] [HEARTBEAT] Received PROBE, sending HEARTBEAT response
 Node #0  [ 376.29403] [JOIN] Selecting CLUSTER_HEAD 10 (hop=12) - no greens available
 Node #1  [ 376.29404] [JOIN] Selecting CLUSTER_HEAD 10 (hop=12) - no greens available
+Node #10 [ 376.29411] [CH] Added 0 to members_table (direct join)
+Node #10 [ 376.29413] [CH] Added 1 to members_table (direct join)
 Node #38 [ 378.29387] [CH] Promotion lock timeout, releasing lock
 Node #38 [ 378.29387] [CH] Clearing stuck yellows: {28}
 Node #85 [ 391.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
@@ -648,11 +803,14 @@ Node #17 [ 406.29396] [GREEN] Requesting promotion for yellow 7
 Node #28 [ 406.29402] [GREEN] Requesting promotion for yellow 19
 Node #29 [ 406.29402] [GREEN] Requesting promotion for yellow 19
 Node #38 [ 406.29409] [CH] Approving: yellow 19 → CH, green 28
+Node #38 [ 406.29409] [CH] Pre-added child CH 19 with network 19
 Node #38 [ 406.29412] [CH] Yellow 19 already in promotion, ignoring duplicate from green 29
 Node #28 [ 406.29415] [ROUTER] Received router promotion approval for yellow 19
 Node #28 [ 406.29415] [ROUTER] Promoted to ROUTER, bridging CHs [38,254] and 19
 Node #19 [ 406.29424] [ROUTER] Received BECOME_CH from router 28, promoting to CH
 Node #19 [ 406.29424] [ROUTER] Became CH (promoted by router 28)
+Node #19 [ 406.29424] [CH] Notified parent 28 about CH creation
+Node #28 [ 406.29433] [CH] Added child CH 19 (network 19) via router 28
 Node #38 [ 408.29409] [CH] Promotion lock timeout, releasing lock
 Node #38 [ 408.29409] [CH] Clearing stuck yellows: {19}
 Node #85 [ 421.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
@@ -662,6 +820,7 @@ Node #16 [ 421.29331] [GREEN] Requesting promotion for yellow 6
 Node #18 [ 421.29386] [JOIN] Selecting CLUSTER_HEAD 19 (hop=12) - no greens available
 Node #8  [ 421.29386] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to green
 Node #7  [ 421.29387] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to green
+Node #19 [ 421.29393] [CH] Added 18 to members_table (direct join)
 Node #17 [ 421.29394] [GREEN] Requesting promotion for yellow 8
 Node #17 [ 421.29396] [GREEN] Requesting promotion for yellow 7
 Node #85 [ 436.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
@@ -673,8 +832,10 @@ Node #7  [ 436.29387] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to gr
 Node #17 [ 436.29394] [GREEN] Requesting promotion for yellow 8
 Node #17 [ 436.29396] [GREEN] Requesting promotion for yellow 7
 Node #9  [ 436.29431] [JOIN] Selecting CLUSTER_HEAD 19 (hop=12) - no greens available
+Node #19 [ 436.29438] [CH] Added 9 to members_table (direct join)
 Node #18 [ 436.29439] [GREEN] Requesting promotion for yellow 9
 Node #19 [ 436.29446] [CH] Approving: yellow 9 → CH, green 18
+Node #19 [ 436.29446] [CH] Pre-added child CH 9 with network 9
 Node #18 [ 436.29452] [ROUTER] Received router promotion approval for yellow 9
 Node #18 [ 436.29452] [ROUTER] Promoted to ROUTER, bridging CHs [19,254] and 9
 Node #19 [ 438.29446] [CH] Promotion lock timeout, releasing lock
@@ -685,9 +846,11 @@ Node #6  [ 451.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to gr
 Node #16 [ 451.29331] [GREEN] Requesting promotion for yellow 6
 Node #8  [ 451.29386] [JOIN] Selecting REGISTERED 9 (dist=88.0m) - direct to green
 Node #7  [ 451.29387] [JOIN] Selecting REGISTERED 17 (dist=89.9m) - direct to green
+Node #18 [ 451.29391] [CH] Added 8 to members_table (direct join)
 Node #9  [ 451.29395] [GREEN] Requesting promotion for yellow 8
 Node #17 [ 451.29396] [GREEN] Requesting promotion for yellow 7
 Node #19 [ 451.29402] [CH] Approving: yellow 8 → CH, green 9
+Node #19 [ 451.29402] [CH] Pre-added child CH 8 with network 8
 Node #9  [ 451.29409] [ROUTER] Received router promotion approval for yellow 8
 Node #9  [ 451.29409] [ROUTER] Promoted to ROUTER, bridging CHs [19,254] and 8
 Node #19 [ 453.29402] [CH] Promotion lock timeout, releasing lock
@@ -818,6 +981,1302 @@ Node #6  [ 766.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to gr
 Node #16 [ 766.29331] [GREEN] Requesting promotion for yellow 6
 Node #7  [ 766.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
 Node #8  [ 766.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 781.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 781.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 781.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 781.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 781.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 781.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 796.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 796.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 796.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 796.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 796.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 796.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 811.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 811.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 811.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 811.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 811.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 811.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 826.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 826.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 826.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 826.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 826.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 826.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 841.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 841.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 841.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 841.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 841.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 841.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 856.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 856.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 856.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 856.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 856.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 856.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 871.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 871.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 871.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 871.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 871.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 871.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 886.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 886.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 886.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 886.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 886.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 886.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 901.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 901.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 901.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 901.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 901.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 901.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 916.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 916.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 916.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 916.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 916.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 916.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 931.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 931.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 931.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 931.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 931.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 931.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 946.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 946.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 946.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 946.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 946.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 946.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 961.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 961.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 961.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 961.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 961.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 961.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 976.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [ 976.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 976.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 976.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 976.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 976.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [ 991.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [ 991.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [ 991.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [ 991.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [ 991.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [ 991.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1006.29213] [JOIN] Selecting REGISTERED 84 (dist=71.8m) - direct to green
+Node #84 [1006.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1006.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1006.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1006.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1006.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1021.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1021.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1021.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1021.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1021.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1021.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1036.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1036.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1036.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1036.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1036.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1036.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1051.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1051.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1051.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1051.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1051.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1051.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1066.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1066.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1066.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1066.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1066.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1066.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1081.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1081.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1081.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1081.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1081.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1081.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1096.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1096.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1096.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1096.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1096.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1096.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1111.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1111.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1111.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1111.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1111.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1111.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1126.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1126.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1126.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1126.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1126.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1126.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1141.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1141.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1141.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1141.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1141.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1141.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1156.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1156.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1156.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1156.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1156.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1156.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1171.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1171.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1171.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1171.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1171.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1171.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1186.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1186.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1186.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1186.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1186.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1186.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1201.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1201.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1201.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1201.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1201.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1201.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1216.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1216.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1216.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1216.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1216.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1216.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1231.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1231.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1231.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1231.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1231.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1231.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1246.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1246.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1246.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1246.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1246.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1246.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1261.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1261.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1261.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1261.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1261.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1261.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1276.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1276.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1276.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1276.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1276.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1276.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1291.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1291.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1291.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1291.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1291.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1291.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1306.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1306.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1306.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1306.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1306.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1306.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1321.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1321.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1321.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1321.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1321.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1321.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1336.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1336.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1336.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1336.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1336.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1336.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1351.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1351.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1351.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1351.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1351.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1351.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1366.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1366.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1366.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1366.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1366.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1366.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1381.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1381.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1381.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1381.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1381.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1381.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1396.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1396.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1396.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1396.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1396.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1396.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1411.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1411.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1411.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1411.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1411.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1411.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1426.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1426.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1426.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1426.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1426.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1426.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1441.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1441.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1441.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1441.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1441.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1441.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1456.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1456.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1456.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1456.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1456.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1456.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1471.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1471.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1471.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1471.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1471.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1471.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1486.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1486.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1486.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1486.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1486.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1486.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1501.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1501.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1501.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1501.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1501.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1501.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1516.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1516.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1516.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1516.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1516.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1516.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1531.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1531.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1531.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1531.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1531.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1531.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1546.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1546.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1546.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1546.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1546.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1546.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1561.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1561.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1561.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1561.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1561.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1561.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1576.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1576.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1576.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1576.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1576.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1576.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1591.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1591.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1591.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1591.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1591.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1591.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1606.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1606.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1606.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1606.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1606.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1606.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1621.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1621.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1621.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1621.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1621.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1621.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1636.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1636.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1636.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1636.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1636.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1636.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1651.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1651.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1651.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1651.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1651.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1651.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1666.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1666.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1666.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1666.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1666.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1666.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1681.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1681.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1681.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1681.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1681.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1681.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1696.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1696.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1696.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1696.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1696.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1696.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1711.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1711.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1711.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1711.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1711.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1711.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1726.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1726.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1726.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1726.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1726.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1726.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1741.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1741.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1741.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1741.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1741.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1741.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1756.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1756.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1756.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1756.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1756.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1756.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1771.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1771.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1771.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1771.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1771.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1771.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1786.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1786.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1786.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1786.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1786.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1786.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1801.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1801.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1801.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1801.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1801.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1801.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1816.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1816.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1816.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1816.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1816.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1816.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1831.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1831.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1831.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1831.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1831.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1831.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1846.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1846.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1846.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1846.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1846.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1846.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1861.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1861.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1861.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1861.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1861.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1861.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1876.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1876.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1876.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1876.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1876.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1876.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1891.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1891.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1891.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1891.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1891.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1891.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1906.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1906.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1906.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1906.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1906.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1906.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1921.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1921.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1921.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1921.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1921.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1921.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1936.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1936.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1936.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1936.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1936.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1936.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1951.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1951.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1951.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1951.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1951.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1951.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1966.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1966.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1966.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1966.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1966.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1966.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1981.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1981.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1981.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1981.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1981.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1981.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [1996.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [1996.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [1996.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [1996.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [1996.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [1996.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2011.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2011.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2011.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2011.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2011.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2011.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2026.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2026.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2026.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2026.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2026.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2026.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2041.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2041.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2041.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2041.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2041.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2041.29394] [GREEN] Requesting promotion for yellow 7
+Node #82 [2046.29120] [MultiHop] Shared 5 neighbors
+Node #71 [2046.29121] [MultiHop] Shared 4 neighbors
+Node #81 [2046.29124] [MultiHop] Learned 5 2-hop neighbors via 82
+Node #72 [2046.29125] [MultiHop] Learned 5 2-hop neighbors via 82
+Node #81 [2046.29126] [MultiHop] Learned 4 2-hop neighbors via 71
+Node #71 [2046.29127] [MultiHop] Learned 5 2-hop neighbors via 82
+Node #72 [2046.29127] [MultiHop] Learned 4 2-hop neighbors via 71
+Node #70 [2046.29128] [MultiHop] Learned 4 2-hop neighbors via 71
+Node #82 [2046.29129] [MultiHop] Learned 4 2-hop neighbors via 71
+Node #72 [2046.29129] [MultiHop] Shared 4 neighbors
+Node #80 [2046.29129] [MultiHop] Shared 3 neighbors
+Node #92 [2046.29130] [MultiHop] Learned 5 2-hop neighbors via 82
+Node #73 [2046.29130] [MultiHop] Learned 5 2-hop neighbors via 82
+Node #70 [2046.29131] [MultiHop] Shared 3 neighbors
+Node #73 [2046.29135] [MultiHop] Learned 4 2-hop neighbors via 72
+Node #82 [2046.29135] [MultiHop] Learned 4 2-hop neighbors via 72
+Node #70 [2046.29136] [MultiHop] Learned 3 2-hop neighbors via 80
+Node #71 [2046.29136] [MultiHop] Learned 4 2-hop neighbors via 72
+Node #90 [2046.29137] [MultiHop] Learned 3 2-hop neighbors via 80
+Node #80 [2046.29137] [MultiHop] Learned 3 2-hop neighbors via 70
+Node #81 [2046.29137] [MultiHop] Learned 4 2-hop neighbors via 72
+Node #81 [2046.29137] [MultiHop] Learned 3 2-hop neighbors via 80
+Node #71 [2046.29138] [MultiHop] Learned 3 2-hop neighbors via 70
+Node #81 [2046.29139] [MultiHop] Learned 3 2-hop neighbors via 70
+Node #85 [2056.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2056.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2056.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2056.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2056.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2056.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2071.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2071.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2071.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2071.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2071.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2071.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2086.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2086.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2086.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2086.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2086.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2086.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2101.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2101.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2101.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2101.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2101.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2101.29394] [GREEN] Requesting promotion for yellow 7
+Node #72 [2106.29129] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #70 [2106.29131] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #73 [2106.29157] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #90 [2106.29167] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #63 [2106.29181] [MultiHop] Shared 5 neighbors
+Node #64 [2106.29182] [MultiHop] Shared 4 neighbors
+Node #74 [2106.29183] [MultiHop] Shared 5 neighbors
+Node #74 [2106.29186] [MultiHop] Learned 4 2-hop neighbors via 64
+Node #83 [2106.29186] [MultiHop] Shared 4 neighbors
+Node #64 [2106.29187] [MultiHop] Learned 5 2-hop neighbors via 74
+Node #62 [2106.29188] [MultiHop] Learned 5 2-hop neighbors via 63
+Node #73 [2106.29189] [MultiHop] Learned 5 2-hop neighbors via 63
+Node #64 [2106.29189] [MultiHop] Learned 5 2-hop neighbors via 63
+Node #53 [2106.29189] [MultiHop] Learned 5 2-hop neighbors via 63
+Node #65 [2106.29190] [MultiHop] Learned 4 2-hop neighbors via 64
+Node #63 [2106.29190] [MultiHop] Learned 4 2-hop neighbors via 64
+Node #65 [2106.29190] [MultiHop] Learned 5 2-hop neighbors via 74
+Node #73 [2106.29190] [MultiHop] Learned 4 2-hop neighbors via 64
+Node #54 [2106.29191] [MultiHop] Learned 5 2-hop neighbors via 63
+Node #84 [2106.29191] [MultiHop] Learned 5 2-hop neighbors via 74
+Node #73 [2106.29192] [MultiHop] Learned 5 2-hop neighbors via 74
+Node #84 [2106.29192] [MultiHop] Learned 4 2-hop neighbors via 83
+Node #93 [2106.29193] [MultiHop] Learned 4 2-hop neighbors via 83
+Node #83 [2106.29193] [MultiHop] Learned 5 2-hop neighbors via 74
+Node #73 [2106.29196] [MultiHop] Learned 4 2-hop neighbors via 83
+Node #74 [2106.29196] [MultiHop] Learned 4 2-hop neighbors via 83
+Node #92 [2111.29159] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #81 [2116.00000] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #82 [2116.29120] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #71 [2116.29121] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #80 [2116.29129] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #70 [2116.29131] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2116.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2116.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2116.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2116.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2116.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2116.29394] [GREEN] Requesting promotion for yellow 7
+Node #91 [2121.29176] [MultiHop] Shared 2 neighbors
+Node #90 [2121.29180] [MultiHop] Learned 2 2-hop neighbors via 91
+Node #92 [2121.29183] [MultiHop] Learned 2 2-hop neighbors via 91
+Node #93 [2121.29185] [MultiHop] Shared 3 neighbors
+Node #83 [2121.29192] [MultiHop] Learned 3 2-hop neighbors via 93
+Node #92 [2121.29194] [MultiHop] Learned 3 2-hop neighbors via 93
+Node #94 [2121.29194] [MultiHop] Learned 3 2-hop neighbors via 93
+Node #85 [2131.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2131.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2131.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2131.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2131.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2131.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2146.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2146.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2146.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2146.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2146.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2146.29394] [GREEN] Requesting promotion for yellow 7
+Node #53 [2151.29206] [MultiHop] Shared 5 neighbors
+Node #54 [2151.29210] [MultiHop] Shared 5 neighbors
+Node #43 [2151.29211] [MultiHop] Learned 5 2-hop neighbors via 53
+Node #54 [2151.29211] [MultiHop] Learned 5 2-hop neighbors via 53
+Node #44 [2151.29212] [MultiHop] Learned 5 2-hop neighbors via 53
+Node #53 [2151.29214] [MultiHop] Learned 5 2-hop neighbors via 54
+Node #52 [2151.29215] [MultiHop] Learned 5 2-hop neighbors via 53
+Node #63 [2151.29215] [MultiHop] Learned 5 2-hop neighbors via 53
+Node #44 [2151.29215] [MultiHop] Learned 5 2-hop neighbors via 54
+Node #43 [2151.29218] [MultiHop] Learned 5 2-hop neighbors via 54
+Node #55 [2151.29219] [MultiHop] Learned 5 2-hop neighbors via 54
+Node #63 [2151.29220] [MultiHop] Learned 5 2-hop neighbors via 54
+Node #85 [2161.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2161.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2161.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2161.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2161.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2161.29394] [GREEN] Requesting promotion for yellow 7
+Node #84 [2166.29206] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #84 [2166.29206] [MultiHop] Shared 2 neighbors
+Node #83 [2166.29212] [MultiHop] Learned 2 2-hop neighbors via 84
+Node #85 [2166.29213] [MultiHop] Learned 2 2-hop neighbors via 84
+Node #74 [2166.29213] [MultiHop] Learned 2 2-hop neighbors via 84
+Node #62 [2166.29219] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #61 [2166.29234] [MultiHop] Shared 4 neighbors
+Node #62 [2166.29239] [MultiHop] Learned 4 2-hop neighbors via 61
+Node #51 [2166.29240] [MultiHop] Learned 4 2-hop neighbors via 61
+Node #60 [2166.29242] [MultiHop] Learned 4 2-hop neighbors via 61
+Node #52 [2166.29243] [MultiHop] Learned 4 2-hop neighbors via 61
+Node #52 [2166.29244] [MultiHop] Shared 7 neighbors
+Node #51 [2166.29248] [MultiHop] Shared 6 neighbors
+Node #43 [2166.29250] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #42 [2166.29251] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #62 [2166.29252] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #41 [2166.29252] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #53 [2166.29252] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #51 [2166.29253] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #61 [2166.29253] [MultiHop] Learned 7 2-hop neighbors via 52
+Node #41 [2166.29254] [MultiHop] Learned 6 2-hop neighbors via 51
+Node #61 [2166.29254] [MultiHop] Learned 6 2-hop neighbors via 51
+Node #50 [2166.29255] [MultiHop] Learned 6 2-hop neighbors via 51
+Node #60 [2166.29256] [MultiHop] Learned 6 2-hop neighbors via 51
+Node #52 [2166.29257] [MultiHop] Learned 6 2-hop neighbors via 51
+Node #62 [2166.29258] [MultiHop] Learned 6 2-hop neighbors via 51
+Node #93 [2171.29185] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #53 [2171.29206] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #54 [2171.29210] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #65 [2171.29221] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #73 [2176.29157] [MultiHop] Removed 6 stale 2-hop neighbors
+Node #63 [2176.29181] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #64 [2176.29182] [MultiHop] Removed 5 stale 2-hop neighbors
+Node #74 [2176.29183] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #83 [2176.29186] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2176.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2176.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2176.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2176.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2176.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2176.29394] [GREEN] Requesting promotion for yellow 7
+Node #94 [2181.29230] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #55 [2181.29238] [MultiHop] Shared 4 neighbors
+Node #75 [2181.29242] [MultiHop] Shared 4 neighbors
+Node #66 [2181.29243] [MultiHop] Shared 6 neighbors
+Node #45 [2181.29245] [MultiHop] Learned 4 2-hop neighbors via 55
+Node #95 [2181.29246] [MultiHop] Shared 2 neighbors
+Node #54 [2181.29247] [MultiHop] Learned 4 2-hop neighbors via 55
+Node #65 [2181.29247] [MultiHop] Learned 4 2-hop neighbors via 55
+Node #56 [2181.29248] [MultiHop] Learned 4 2-hop neighbors via 55
+Node #76 [2181.29248] [MultiHop] Learned 4 2-hop neighbors via 75
+Node #85 [2181.29248] [MultiHop] Learned 4 2-hop neighbors via 75
+Node #76 [2181.29248] [MultiHop] Learned 6 2-hop neighbors via 66
+Node #65 [2181.29249] [MultiHop] Learned 4 2-hop neighbors via 75
+Node #66 [2181.29249] [MultiHop] Learned 4 2-hop neighbors via 75
+Node #75 [2181.29250] [MultiHop] Learned 6 2-hop neighbors via 66
+Node #65 [2181.29250] [MultiHop] Learned 6 2-hop neighbors via 66
+Node #86 [2181.29250] [MultiHop] Learned 4 2-hop neighbors via 75
+Node #56 [2181.29251] [MultiHop] Learned 6 2-hop neighbors via 66
+Node #94 [2181.29251] [MultiHop] Learned 2 2-hop neighbors via 95
+Node #67 [2181.29251] [MultiHop] Learned 6 2-hop neighbors via 66
+Node #77 [2181.29252] [MultiHop] Learned 6 2-hop neighbors via 66
+Node #96 [2181.29253] [MultiHop] Learned 2 2-hop neighbors via 95
+Node #90 [2186.29167] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #83 [2186.29186] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #92 [2191.29159] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #85 [2191.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2191.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2191.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2191.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2191.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2191.29394] [GREEN] Requesting promotion for yellow 7
+Node #85 [2206.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2206.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2206.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2206.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2206.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2206.29394] [GREEN] Requesting promotion for yellow 7
+Node #55 [2211.29238] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #44 [2211.29242] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #50 [2211.29264] [MultiHop] Shared 2 neighbors
+Node #60 [2211.29269] [MultiHop] Learned 2 2-hop neighbors via 50
+Node #51 [2211.29271] [MultiHop] Learned 2 2-hop neighbors via 50
+Node #63 [2216.29181] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #43 [2216.29227] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #52 [2216.29244] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #53 [2221.29206] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #54 [2221.29210] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2221.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2221.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2221.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2221.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2221.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2221.29394] [GREEN] Requesting promotion for yellow 7
+Node #43 [2226.29227] [MultiHop] Shared 6 neighbors
+Node #53 [2226.29231] [MultiHop] Learned 6 2-hop neighbors via 43
+Node #52 [2226.29233] [MultiHop] Learned 6 2-hop neighbors via 43
+Node #44 [2226.29234] [MultiHop] Learned 6 2-hop neighbors via 43
+Node #33 [2226.29234] [MultiHop] Learned 6 2-hop neighbors via 43
+Node #54 [2226.29235] [MultiHop] Learned 6 2-hop neighbors via 43
+Node #42 [2226.29235] [MultiHop] Learned 6 2-hop neighbors via 43
+Node #77 [2226.29263] [MultiHop] Shared 5 neighbors
+Node #67 [2226.29265] [MultiHop] Shared 4 neighbors
+Node #86 [2226.29266] [MultiHop] Shared 4 neighbors
+Node #41 [2226.29266] [MultiHop] Shared 5 neighbors
+Node #41 [2226.29266] [MultiHop] Removed 6 stale 2-hop neighbors
+Node #67 [2226.29267] [MultiHop] Learned 5 2-hop neighbors via 77
+Node #60 [2226.29267] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #76 [2226.29268] [MultiHop] Learned 5 2-hop neighbors via 77
+Node #77 [2226.29269] [MultiHop] Learned 4 2-hop neighbors via 67
+Node #51 [2226.29271] [MultiHop] Learned 5 2-hop neighbors via 41
+Node #87 [2226.29271] [MultiHop] Learned 5 2-hop neighbors via 77
+Node #76 [2226.29272] [MultiHop] Learned 4 2-hop neighbors via 67
+Node #86 [2226.29272] [MultiHop] Learned 5 2-hop neighbors via 77
+Node #85 [2226.29272] [MultiHop] Learned 4 2-hop neighbors via 86
+Node #66 [2226.29273] [MultiHop] Learned 5 2-hop neighbors via 77
+Node #42 [2226.29273] [MultiHop] Learned 5 2-hop neighbors via 41
+Node #87 [2226.29273] [MultiHop] Learned 4 2-hop neighbors via 86
+Node #40 [2226.29273] [MultiHop] Learned 5 2-hop neighbors via 41
+Node #57 [2226.29274] [MultiHop] Learned 4 2-hop neighbors via 67
+Node #76 [2226.29274] [MultiHop] Learned 4 2-hop neighbors via 86
+Node #75 [2226.29274] [MultiHop] Learned 4 2-hop neighbors via 86
+Node #66 [2226.29274] [MultiHop] Learned 4 2-hop neighbors via 67
+Node #52 [2226.29274] [MultiHop] Learned 5 2-hop neighbors via 41
+Node #31 [2226.29275] [MultiHop] Learned 5 2-hop neighbors via 41
+Node #77 [2226.29275] [MultiHop] Learned 4 2-hop neighbors via 86
+Node #53 [2231.29206] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #50 [2231.29264] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #42 [2231.29281] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2236.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #62 [2236.29219] [MultiHop] Removed 6 stale 2-hop neighbors
+Node #84 [2236.29220] [GREEN] Requesting promotion for yellow 85
+Node #43 [2236.29227] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #61 [2236.29234] [MultiHop] Removed 5 stale 2-hop neighbors
+Node #52 [2236.29244] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #51 [2236.29248] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #6  [2236.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2236.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2236.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2236.29394] [GREEN] Requesting promotion for yellow 7
+Node #56 [2241.29266] [MultiHop] Shared 5 neighbors
+Node #56 [2241.29266] [MultiHop] Removed 6 stale 2-hop neighbors
+Node #57 [2241.29271] [MultiHop] Learned 5 2-hop neighbors via 56
+Node #76 [2241.29273] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #66 [2241.29274] [MultiHop] Learned 5 2-hop neighbors via 56
+Node #45 [2241.29275] [MultiHop] Learned 5 2-hop neighbors via 56
+Node #46 [2241.29276] [MultiHop] Learned 5 2-hop neighbors via 56
+Node #55 [2241.29276] [MultiHop] Learned 5 2-hop neighbors via 56
+Node #96 [2241.29279] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #32 [2241.29298] [MultiHop] Shared 3 neighbors
+Node #42 [2241.29304] [MultiHop] Learned 3 2-hop neighbors via 32
+Node #22 [2241.29305] [MultiHop] Learned 3 2-hop neighbors via 32
+Node #33 [2241.29305] [MultiHop] Shared 5 neighbors
+Node #31 [2241.29305] [MultiHop] Learned 3 2-hop neighbors via 32
+Node #31 [2241.29309] [MultiHop] Shared 7 neighbors
+Node #43 [2241.29312] [MultiHop] Learned 5 2-hop neighbors via 33
+Node #44 [2241.29313] [MultiHop] Learned 5 2-hop neighbors via 33
+Node #34 [2241.29313] [MultiHop] Learned 5 2-hop neighbors via 33
+Node #24 [2241.29314] [MultiHop] Learned 5 2-hop neighbors via 33
+Node #42 [2241.29314] [MultiHop] Learned 5 2-hop neighbors via 33
+Node #40 [2241.29316] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #32 [2241.29316] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #20 [2241.29318] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #21 [2241.29318] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #30 [2241.29318] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #41 [2241.29319] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #42 [2241.29319] [MultiHop] Learned 7 2-hop neighbors via 31
+Node #77 [2246.29263] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #67 [2246.29265] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #86 [2246.29266] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #45 [2246.29277] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #54 [2251.29210] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #85 [2251.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2251.29220] [GREEN] Requesting promotion for yellow 85
+Node #65 [2251.29221] [MultiHop] Removed 7 stale 2-hop neighbors
+Node #94 [2251.29230] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #75 [2251.29242] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #6  [2251.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2251.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2251.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2251.29394] [GREEN] Requesting promotion for yellow 7
+Node #46 [2256.29297] [MultiHop] Shared 5 neighbors
+Node #45 [2256.29303] [MultiHop] Learned 5 2-hop neighbors via 46
+Node #47 [2256.29304] [MultiHop] Learned 5 2-hop neighbors via 46
+Node #36 [2256.29305] [MultiHop] Learned 5 2-hop neighbors via 46
+Node #37 [2256.29305] [MultiHop] Learned 5 2-hop neighbors via 46
+Node #56 [2256.29306] [MultiHop] Learned 5 2-hop neighbors via 46
+Node #85 [2266.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2266.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2266.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2266.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2266.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2266.29394] [GREEN] Requesting promotion for yellow 7
+Node #34 [2271.29262] [MultiHop] Shared 5 neighbors
+Node #35 [2271.29268] [MultiHop] Learned 5 2-hop neighbors via 34
+Node #44 [2271.29269] [MultiHop] Learned 5 2-hop neighbors via 34
+Node #33 [2271.29270] [MultiHop] Learned 5 2-hop neighbors via 34
+Node #24 [2271.29271] [MultiHop] Learned 5 2-hop neighbors via 34
+Node #25 [2271.29272] [MultiHop] Learned 5 2-hop neighbors via 34
+Node #30 [2271.29336] [MultiHop] Shared 3 neighbors
+Node #20 [2271.29340] [MultiHop] Learned 3 2-hop neighbors via 30
+Node #40 [2271.29344] [MultiHop] Learned 3 2-hop neighbors via 30
+Node #31 [2271.29345] [MultiHop] Learned 3 2-hop neighbors via 30
+Node #85 [2281.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2281.29220] [GREEN] Requesting promotion for yellow 85
+Node #6  [2281.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2281.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2281.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2281.29394] [GREEN] Requesting promotion for yellow 7
+Node #52 [2286.29244] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #87 [2286.29299] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #40 [2286.29302] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #97 [2286.29322] [MultiHop] Shared 3 neighbors
+Node #88 [2286.29323] [MultiHop] Shared 6 neighbors
+Node #47 [2286.29323] [MultiHop] Shared 3 neighbors
+Node #37 [2286.29327] [MultiHop] Learned 3 2-hop neighbors via 47
+Node #88 [2286.29329] [MultiHop] Learned 3 2-hop neighbors via 97
+Node #98 [2286.29329] [MultiHop] Learned 3 2-hop neighbors via 97
+Node #97 [2286.29329] [MultiHop] Learned 6 2-hop neighbors via 88
+Node #46 [2286.29330] [MultiHop] Learned 3 2-hop neighbors via 47
+Node #98 [2286.29330] [MultiHop] Learned 6 2-hop neighbors via 88
+Node #87 [2286.29330] [MultiHop] Learned 3 2-hop neighbors via 97
+Node #87 [2286.29331] [MultiHop] Learned 6 2-hop neighbors via 88
+Node #78 [2286.29332] [MultiHop] Learned 6 2-hop neighbors via 88
+Node #89 [2286.29332] [MultiHop] Learned 6 2-hop neighbors via 88
+Node #79 [2286.29332] [MultiHop] Learned 6 2-hop neighbors via 88
+Node #57 [2286.29333] [MultiHop] Learned 3 2-hop neighbors via 47
+Node #21 [2286.29335] [MultiHop] Shared 5 neighbors
+Node #11 [2286.29341] [MultiHop] Learned 5 2-hop neighbors via 21
+Node #20 [2286.29343] [MultiHop] Learned 5 2-hop neighbors via 21
+Node #22 [2286.29343] [MultiHop] Learned 5 2-hop neighbors via 21
+Node #31 [2286.29344] [MultiHop] Learned 5 2-hop neighbors via 21
+Node #12 [2286.29345] [MultiHop] Learned 5 2-hop neighbors via 21
+Node #53 [2291.29206] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #54 [2291.29210] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #44 [2291.29242] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #75 [2291.29242] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #66 [2291.29243] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #76 [2291.29273] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #42 [2291.29281] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #57 [2291.29304] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #33 [2291.29305] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #31 [2291.29309] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2296.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2296.29220] [GREEN] Requesting promotion for yellow 85
+Node #52 [2296.29244] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #51 [2296.29248] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #77 [2296.29263] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #67 [2296.29265] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #86 [2296.29266] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #6  [2296.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2296.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2296.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2296.29394] [GREEN] Requesting promotion for yellow 7
+Node #35 [2301.29287] [MultiHop] Shared 3 neighbors
+Node #25 [2301.29290] [MultiHop] Shared 7 neighbors
+Node #25 [2301.29292] [MultiHop] Learned 3 2-hop neighbors via 35
+Node #34 [2301.29293] [MultiHop] Learned 3 2-hop neighbors via 35
+Node #35 [2301.29295] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #36 [2301.29297] [MultiHop] Learned 3 2-hop neighbors via 35
+Node #15 [2301.29297] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #26 [2301.29298] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #16 [2301.29298] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #36 [2301.29298] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #34 [2301.29299] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #24 [2301.29299] [MultiHop] Learned 7 2-hop neighbors via 25
+Node #57 [2301.29304] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #37 [2301.29324] [MultiHop] Shared 5 neighbors
+Node #58 [2301.29325] [MultiHop] Shared 5 neighbors
+Node #47 [2301.29328] [MultiHop] Learned 5 2-hop neighbors via 37
+Node #22 [2301.29329] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #48 [2301.29331] [MultiHop] Learned 5 2-hop neighbors via 58
+Node #57 [2301.29331] [MultiHop] Learned 5 2-hop neighbors via 58
+Node #38 [2301.29332] [MultiHop] Learned 5 2-hop neighbors via 37
+Node #46 [2301.29332] [MultiHop] Learned 5 2-hop neighbors via 37
+Node #27 [2301.29333] [MultiHop] Learned 5 2-hop neighbors via 37
+Node #68 [2301.29333] [MultiHop] Learned 5 2-hop neighbors via 58
+Node #36 [2301.29334] [MultiHop] Learned 5 2-hop neighbors via 37
+Node #59 [2301.29334] [MultiHop] Learned 5 2-hop neighbors via 58
+Node #69 [2301.29335] [MultiHop] Learned 5 2-hop neighbors via 58
+Node #30 [2301.29336] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #12 [2301.29354] [MultiHop] Shared 5 neighbors
+Node #23 [2301.29355] [MultiHop] Shared 5 neighbors
+Node #13 [2301.29358] [MultiHop] Learned 5 2-hop neighbors via 12
+Node #24 [2301.29360] [MultiHop] Learned 5 2-hop neighbors via 23
+Node #2  [2301.29362] [MultiHop] Learned 5 2-hop neighbors via 12
+Node #13 [2301.29363] [MultiHop] Learned 5 2-hop neighbors via 23
+Node #22 [2301.29363] [MultiHop] Learned 5 2-hop neighbors via 12
+Node #14 [2301.29363] [MultiHop] Learned 5 2-hop neighbors via 23
+Node #22 [2301.29363] [MultiHop] Learned 5 2-hop neighbors via 23
+Node #23 [2301.29364] [MultiHop] Learned 5 2-hop neighbors via 12
+Node #21 [2301.29364] [MultiHop] Learned 5 2-hop neighbors via 12
+Node #12 [2301.29364] [MultiHop] Learned 5 2-hop neighbors via 23
+Node #43 [2306.29227] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #41 [2306.29266] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #45 [2306.29277] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #46 [2306.29297] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #40 [2306.29302] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #21 [2306.29335] [MultiHop] Removed 5 stale 2-hop neighbors
+Node #20 [2306.29344] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #24 [2306.29352] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2311.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2311.29220] [GREEN] Requesting promotion for yellow 85
+Node #55 [2311.29238] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #44 [2311.29242] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #66 [2311.29243] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #34 [2311.29262] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #42 [2311.29281] [MultiHop] Removed 8 stale 2-hop neighbors
+Node #32 [2311.29298] [MultiHop] Removed 5 stale 2-hop neighbors
+Node #6  [2311.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2311.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2311.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2311.29394] [GREEN] Requesting promotion for yellow 7
+Node #47 [2316.29323] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #36 [2316.29334] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #27 [2316.29354] [MultiHop] Shared 5 neighbors
+Node #26 [2316.29354] [MultiHop] Shared 5 neighbors
+Node #11 [2316.29357] [MultiHop] Shared 3 neighbors
+Node #16 [2316.29359] [MultiHop] Learned 5 2-hop neighbors via 26
+Node #36 [2316.29361] [MultiHop] Learned 5 2-hop neighbors via 27
+Node #36 [2316.29361] [MultiHop] Learned 5 2-hop neighbors via 26
+Node #26 [2316.29361] [MultiHop] Learned 5 2-hop neighbors via 27
+Node #27 [2316.29361] [MultiHop] Learned 5 2-hop neighbors via 26
+Node #17 [2316.29362] [MultiHop] Learned 5 2-hop neighbors via 27
+Node #21 [2316.29363] [MultiHop] Learned 3 2-hop neighbors via 11
+Node #17 [2316.29363] [MultiHop] Learned 5 2-hop neighbors via 26
+Node #25 [2316.29363] [MultiHop] Learned 5 2-hop neighbors via 26
+Node #37 [2316.29363] [MultiHop] Learned 5 2-hop neighbors via 27
+Node #38 [2316.29364] [MultiHop] Learned 5 2-hop neighbors via 27
+Node #10 [2316.29365] [MultiHop] Learned 3 2-hop neighbors via 11
+Node #20 [2316.29365] [MultiHop] Learned 3 2-hop neighbors via 11
+Node #14 [2316.29377] [MultiHop] Shared 5 neighbors
+Node #15 [2316.29381] [MultiHop] Learned 5 2-hop neighbors via 14
+Node #24 [2316.29385] [MultiHop] Learned 5 2-hop neighbors via 14
+Node #23 [2316.29385] [MultiHop] Learned 5 2-hop neighbors via 14
+Node #4  [2316.29385] [MultiHop] Learned 5 2-hop neighbors via 14
+Node #5  [2316.29386] [MultiHop] Learned 5 2-hop neighbors via 14
+Node #56 [2321.29266] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #37 [2321.29324] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2326.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2326.29220] [GREEN] Requesting promotion for yellow 85
+Node #45 [2326.29277] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #6  [2326.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2326.29331] [GREEN] Requesting promotion for yellow 6
+Node #7  [2326.29387] [JOIN] Selecting REGISTERED 8 (dist=88.0m) - direct to green
+Node #8  [2326.29394] [GREEN] Requesting promotion for yellow 7
+Node #35 [2331.29287] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #25 [2331.29290] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #33 [2331.29305] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #16 [2331.29316] [MultiHop] Shared 3 neighbors
+Node #26 [2331.29321] [MultiHop] Learned 3 2-hop neighbors via 16
+Node #15 [2331.29322] [MultiHop] Learned 3 2-hop neighbors via 16
+Node #6  [2331.29323] [MultiHop] Learned 3 2-hop neighbors via 16
+Node #25 [2331.29324] [MultiHop] Learned 3 2-hop neighbors via 16
+Node #89 [2331.29348] [MultiHop] Shared 4 neighbors
+Node #99 [2331.29353] [MultiHop] Learned 4 2-hop neighbors via 89
+Node #98 [2331.29356] [MultiHop] Learned 4 2-hop neighbors via 89
+Node #88 [2331.29357] [MultiHop] Learned 4 2-hop neighbors via 89
+Node #79 [2331.29357] [MultiHop] Learned 4 2-hop neighbors via 89
+Node #40 [2336.29302] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #20 [2336.29344] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #24 [2336.29352] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2341.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2341.29220] [GREEN] Requesting promotion for yellow 85
+Node #44 [2341.29242] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #6  [2341.29323] [JOIN] Selecting REGISTERED 16 (dist=86.6m) - direct to green
+Node #16 [2341.29331] [GREEN] Requesting promotion for yellow 6
+Node #15 [2341.29338] [CH] Approving: yellow 6 → CH, green 16
+Node #15 [2341.29338] [CH] Added router 16 to members_table
+Node #15 [2341.29338] [CH] Pre-added child CH 6 with network 6
+Node #16 [2341.29344] [ROUTER] Received router promotion approval for yellow 6
+Node #16 [2341.29344] [ROUTER] Promoted to ROUTER, bridging CHs [36,254] and 6
+Node #6  [2341.29352] [ROUTER] Received BECOME_CH from router 16, promoting to CH
+Node #6  [2341.29352] [ROUTER] Became CH (promoted by router 16)
+Node #6  [2341.29352] [CH] Notified parent 16 about CH creation
+Node #16 [2341.29360] [CH] Added child CH 6 (network 6) via router 16
+Node #7  [2341.29387] [JOIN] Selecting CLUSTER_HEAD 6 (hop=11) - no greens available
+Node #6  [2341.29393] [CH] Added 7 to members_table (direct join)
+Node #15 [2343.29338] [CH] Promotion lock timeout, releasing lock
+Node #15 [2343.29338] [CH] Clearing stuck yellows: {6}
+Node #79 [2346.29339] [MultiHop] Shared 5 neighbors
+Node #79 [2346.29339] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #78 [2346.29342] [MultiHop] Learned 5 2-hop neighbors via 79
+Node #20 [2346.29344] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #68 [2346.29348] [MultiHop] Shared 5 neighbors
+Node #89 [2346.29348] [MultiHop] Learned 5 2-hop neighbors via 79
+Node #88 [2346.29348] [MultiHop] Learned 5 2-hop neighbors via 79
+Node #59 [2346.29348] [MultiHop] Shared 5 neighbors
+Node #68 [2346.29348] [MultiHop] Learned 5 2-hop neighbors via 79
+Node #69 [2346.29348] [MultiHop] Learned 5 2-hop neighbors via 79
+Node #69 [2346.29351] [MultiHop] Learned 5 2-hop neighbors via 68
+Node #69 [2346.29351] [MultiHop] Shared 5 neighbors
+Node #49 [2346.29354] [MultiHop] Learned 5 2-hop neighbors via 59
+Node #68 [2346.29355] [MultiHop] Learned 5 2-hop neighbors via 69
+Node #78 [2346.29355] [MultiHop] Learned 5 2-hop neighbors via 68
+Node #69 [2346.29355] [MultiHop] Learned 5 2-hop neighbors via 59
+Node #48 [2346.29355] [MultiHop] Learned 5 2-hop neighbors via 59
+Node #58 [2346.29356] [MultiHop] Learned 5 2-hop neighbors via 68
+Node #59 [2346.29357] [MultiHop] Learned 5 2-hop neighbors via 68
+Node #11 [2346.29357] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #79 [2346.29357] [MultiHop] Learned 5 2-hop neighbors via 68
+Node #68 [2346.29357] [MultiHop] Learned 5 2-hop neighbors via 59
+Node #58 [2346.29357] [MultiHop] Learned 5 2-hop neighbors via 59
+Node #98 [2346.29358] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #59 [2346.29358] [MultiHop] Learned 5 2-hop neighbors via 69
+Node #78 [2346.29360] [MultiHop] Learned 5 2-hop neighbors via 69
+Node #79 [2346.29361] [MultiHop] Learned 5 2-hop neighbors via 69
+Node #58 [2346.29361] [MultiHop] Learned 5 2-hop neighbors via 69
+Node #17 [2346.29378] [MultiHop] Shared 5 neighbors
+Node #2  [2346.29379] [MultiHop] Shared 3 neighbors
+Node #99 [2346.29384] [MultiHop] Shared 2 neighbors
+Node #3  [2346.29385] [MultiHop] Learned 3 2-hop neighbors via 2
+Node #18 [2346.29386] [MultiHop] Learned 5 2-hop neighbors via 17
+Node #8  [2346.29386] [MultiHop] Learned 5 2-hop neighbors via 17
+Node #27 [2346.29386] [MultiHop] Learned 5 2-hop neighbors via 17
+Node #26 [2346.29387] [MultiHop] Learned 5 2-hop neighbors via 17
+Node #12 [2346.29387] [MultiHop] Learned 3 2-hop neighbors via 2
+Node #13 [2346.29387] [MultiHop] Learned 3 2-hop neighbors via 2
+Node #7  [2346.29387] [MultiHop] Learned 5 2-hop neighbors via 17
+Node #89 [2346.29388] [MultiHop] Learned 2 2-hop neighbors via 99
+Node #98 [2346.29392] [MultiHop] Learned 2 2-hop neighbors via 99
+Node #4  [2346.29403] [MultiHop] Shared 2 neighbors
+Node #5  [2346.29406] [MultiHop] Shared 4 neighbors
+Node #5  [2346.29409] [MultiHop] Learned 2 2-hop neighbors via 4
+Node #14 [2346.29411] [MultiHop] Learned 2 2-hop neighbors via 4
+Node #4  [2346.29412] [MultiHop] Learned 4 2-hop neighbors via 5
+Node #6  [2346.29415] [MultiHop] Learned 4 2-hop neighbors via 5
+Node #15 [2346.29416] [MultiHop] Learned 4 2-hop neighbors via 5
+Node #14 [2346.29416] [MultiHop] Learned 4 2-hop neighbors via 5
+Node #57 [2351.29304] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #31 [2351.29309] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #37 [2351.29324] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #22 [2351.29329] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #89 [2351.29348] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #12 [2351.29354] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #78 [2351.29365] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #85 [2356.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2356.29220] [GREEN] Requesting promotion for yellow 85
+Node #46 [2356.29297] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #87 [2356.29299] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #97 [2356.29322] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #16 [2361.29316] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #15 [2361.29323] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #48 [2361.29357] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #49 [2361.29376] [MultiHop] Shared 3 neighbors
+Node #39 [2361.29379] [MultiHop] Shared 5 neighbors
+Node #59 [2361.29382] [MultiHop] Learned 3 2-hop neighbors via 49
+Node #13 [2361.29382] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #48 [2361.29383] [MultiHop] Learned 3 2-hop neighbors via 49
+Node #38 [2361.29385] [MultiHop] Learned 5 2-hop neighbors via 39
+Node #39 [2361.29385] [MultiHop] Learned 3 2-hop neighbors via 49
+Node #29 [2361.29387] [MultiHop] Learned 5 2-hop neighbors via 39
+Node #49 [2361.29388] [MultiHop] Learned 5 2-hop neighbors via 39
+Node #28 [2361.29389] [MultiHop] Learned 5 2-hop neighbors via 39
+Node #48 [2361.29389] [MultiHop] Learned 5 2-hop neighbors via 39
+Node #3  [2361.29407] [MultiHop] Shared 2 neighbors
+Node #2  [2361.29412] [MultiHop] Learned 2 2-hop neighbors via 3
+Node #13 [2361.29415] [MultiHop] Learned 2 2-hop neighbors via 3
+Node #46 [2366.29297] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #47 [2366.29323] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #36 [2366.29334] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #21 [2366.29335] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #68 [2366.29348] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #59 [2366.29348] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #69 [2366.29351] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #24 [2366.29352] [MultiHop] Removed 7 stale 2-hop neighbors
+Node #27 [2366.29354] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #26 [2366.29354] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #38 [2366.29365] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #14 [2366.29377] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #2  [2366.29379] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #85 [2371.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2371.29220] [GREEN] Requesting promotion for yellow 85
+Node #34 [2371.29262] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #35 [2371.29287] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #57 [2371.29304] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #22 [2371.29329] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #12 [2371.29354] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #23 [2371.29355] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #38 [2376.29365] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #17 [2376.29378] [MultiHop] Removed 5 stale 2-hop neighbors
+Node #28 [2376.29385] [MultiHop] Shared 5 neighbors
+Node #29 [2376.29391] [MultiHop] Learned 5 2-hop neighbors via 28
+Node #38 [2376.29391] [MultiHop] Learned 5 2-hop neighbors via 28
+Node #19 [2376.29393] [MultiHop] Learned 5 2-hop neighbors via 28
+Node #29 [2376.29393] [MultiHop] Shared 4 neighbors
+Node #18 [2376.29394] [MultiHop] Learned 5 2-hop neighbors via 28
+Node #39 [2376.29394] [MultiHop] Learned 5 2-hop neighbors via 28
+Node #10 [2376.29396] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #28 [2376.29400] [MultiHop] Learned 4 2-hop neighbors via 29
+Node #39 [2376.29401] [MultiHop] Learned 4 2-hop neighbors via 29
+Node #19 [2376.29402] [MultiHop] Learned 4 2-hop neighbors via 29
+Node #4  [2376.29403] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #38 [2376.29403] [MultiHop] Learned 4 2-hop neighbors via 29
+Node #5  [2376.29406] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #0  [2376.29418] [MultiHop] Shared 2 neighbors
+Node #1  [2376.29421] [MultiHop] Shared 2 neighbors
+Node #1  [2376.29422] [MultiHop] Learned 2 2-hop neighbors via 0
+Node #10 [2376.29425] [MultiHop] Learned 2 2-hop neighbors via 0
+Node #0  [2376.29426] [MultiHop] Learned 2 2-hop neighbors via 1
+Node #10 [2376.29430] [MultiHop] Learned 2 2-hop neighbors via 1
+Node #25 [2381.29290] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #16 [2381.29316] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #15 [2381.29323] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #37 [2381.29324] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #23 [2381.29355] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #85 [2386.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2386.29220] [GREEN] Requesting promotion for yellow 85
+Node #36 [2386.29334] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #21 [2386.29335] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #20 [2386.29344] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #24 [2386.29352] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #27 [2386.29354] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #26 [2386.29354] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #15 [2391.29323] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #6  [2391.29352] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #88 [2396.29323] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #79 [2396.29339] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #26 [2396.29354] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #98 [2396.29358] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #99 [2396.29384] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2401.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2401.29220] [GREEN] Requesting promotion for yellow 85
+Node #69 [2406.29351] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #15 [2411.29323] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #58 [2411.29325] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #89 [2411.29348] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #6  [2411.29352] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #12 [2411.29354] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #48 [2411.29357] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #78 [2411.29365] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #49 [2411.29376] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #8  [2411.29396] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #7  [2411.29398] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #18 [2411.29399] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #3  [2411.29407] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2416.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2416.29220] [GREEN] Requesting promotion for yellow 85
+Node #88 [2416.29323] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #79 [2416.29339] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #68 [2416.29348] [MultiHop] Removed 4 stale 2-hop neighbors
+Node #59 [2416.29348] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #69 [2416.29351] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #27 [2416.29354] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #26 [2416.29354] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #14 [2416.29377] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #4  [2416.29403] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #18 [2421.29399] [MultiHop] Shared 5 neighbors
+Node #8  [2421.29404] [MultiHop] Learned 5 2-hop neighbors via 18
+Node #19 [2421.29406] [MultiHop] Learned 5 2-hop neighbors via 18
+Node #17 [2421.29407] [MultiHop] Learned 5 2-hop neighbors via 18
+Node #9  [2421.29407] [MultiHop] Learned 5 2-hop neighbors via 18
+Node #28 [2421.29409] [MultiHop] Learned 5 2-hop neighbors via 18
+Node #59 [2426.29348] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #38 [2426.29365] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #28 [2426.29385] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #29 [2426.29393] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2431.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2431.29220] [GREEN] Requesting promotion for yellow 85
+Node #48 [2431.29357] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #49 [2431.29376] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #39 [2431.29379] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #29 [2436.29393] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #19 [2436.29424] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #9  [2436.29445] [MultiHop] Shared 3 neighbors
+Node #19 [2436.29452] [MultiHop] Learned 3 2-hop neighbors via 9
+Node #18 [2436.29453] [MultiHop] Learned 3 2-hop neighbors via 9
+Node #8  [2436.29453] [MultiHop] Learned 3 2-hop neighbors via 9
+Node #39 [2441.29379] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #18 [2441.29399] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #85 [2446.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2446.29220] [GREEN] Requesting promotion for yellow 85
+Node #38 [2446.29365] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #8  [2451.29396] [MultiHop] Shared 4 neighbors
+Node #18 [2451.29400] [MultiHop] Learned 4 2-hop neighbors via 8
+Node #7  [2451.29403] [MultiHop] Learned 4 2-hop neighbors via 8
+Node #17 [2451.29403] [MultiHop] Learned 4 2-hop neighbors via 8
+Node #9  [2451.29404] [MultiHop] Learned 4 2-hop neighbors via 8
+Node #85 [2461.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2461.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2476.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2476.29220] [GREEN] Requesting promotion for yellow 85
+Node #17 [2486.29378] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #28 [2486.29385] [MultiHop] Removed 3 stale 2-hop neighbors
+Node #19 [2486.29424] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #9  [2486.29445] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2491.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2491.29220] [GREEN] Requesting promotion for yellow 85
+Node #8  [2491.29396] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #8  [2501.29396] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2506.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2506.29220] [GREEN] Requesting promotion for yellow 85
+Node #19 [2506.29424] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #17 [2516.29378] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #9  [2516.29445] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #85 [2521.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2521.29220] [GREEN] Requesting promotion for yellow 85
+Node #7  [2521.29398] [MultiHop] Removed 2 stale 2-hop neighbors
+Node #18 [2521.29399] [MultiHop] Removed 1 stale 2-hop neighbors
+Node #85 [2536.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2536.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2551.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2551.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2566.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2566.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2581.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2581.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2596.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2596.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2611.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2611.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2626.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2626.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2641.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2641.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2656.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2656.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2671.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2671.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2686.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2686.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2701.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2701.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2716.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2716.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2731.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2731.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2746.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2746.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2761.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2761.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2776.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2776.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2791.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2791.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2806.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2806.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2821.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2821.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2836.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2836.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2851.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2851.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2866.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2866.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2881.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2881.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2896.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2896.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2911.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2911.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2926.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2926.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2941.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2941.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2956.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2956.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2971.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2971.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [2986.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [2986.29220] [GREEN] Requesting promotion for yellow 85
+Node #85 [3001.29213] [JOIN] Selecting REGISTERED 84 (dist=74.0m) - direct to green
+Node #84 [3001.29220] [GREEN] Requesting promotion for yellow 85
 
 
 Simulation stopped by user (Ctrl+C)

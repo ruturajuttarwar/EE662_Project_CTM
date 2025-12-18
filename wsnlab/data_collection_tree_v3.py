@@ -30,7 +30,7 @@ NEIGHBOR_TIMEOUT = getattr(config, 'NEIGHBOR_TIMEOUT', 30)  # seconds - remove s
 ENABLE_HYBRID_ROUTING = getattr(config, 'ENABLE_HYBRID_ROUTING', True)  # Toggle CTM-AdHoc hybrid routing
 
 # Multi-Hop Neighbor Discovery Configuration (from config)
-ENABLE_MULTIHOP_NEIGHBORS = getattr(config, 'ENABLE_MULTIHOP_NEIGHBORS', False)  # Toggle multi-hop discovery
+ENABLE_MULTIHOP_NEIGHBORS = getattr(config, 'ENABLE_MULTIHOP_NEIGHBORS', True)  # Toggle multi-hop discovery
 NEIGHBOR_SHARE_INTERVAL = getattr(config, 'NEIGHBOR_SHARE_INTERVAL', 30)  # seconds - share neighbor table interval
 MAX_HOP_COUNT = getattr(config, 'MAX_HOP_COUNT', 2)  # Maximum hop count for multi-hop neighbors
 
@@ -744,7 +744,28 @@ class SensorNode(wsn.Node):
                 # Normal join
                 new_yellow_addr = wsn.Addr(self.ch_addr.net_addr, yellow_id)
                 self.send_join_reply(yellow_id, new_yellow_addr)
+                
+                # Populate members_table
+                if yellow_id not in self.members_table:
+                    self.members_table.append(yellow_id)
+                    self.log(f"[CH] Added {yellow_id} to members_table (direct join)")
 
+
+            if pck['type'] == 'CHILD_CH_CREATED':
+                # Child notifying parent that it became a CH
+                if pck.get('dest_gui') == self.id:
+                    child_ch_id = pck['child_ch_id']
+                    child_network_id = pck['child_network_id']
+                    router_id = pck.get('via_router')
+                    
+                    # Add to child_networks_table
+                    if child_ch_id not in self.child_networks_table:
+                        self.child_networks_table[child_ch_id] = []
+                    
+                    if child_network_id not in self.child_networks_table[child_ch_id]:
+                        self.child_networks_table[child_ch_id].append(child_network_id)
+                        self.log(f"[CH] Added child CH {child_ch_id} (network {child_network_id}) via router {router_id}")
+            
             if pck['type'] == 'NETWORK_REQUEST':  # it sends a network reply to requested node
                 # yield self.timeout(.5)
                 if (self.role == Roles.ROOT or self.role == Roles.CLUSTER_HEAD) and ENABLE_ROUTER_LAYER:
@@ -789,6 +810,21 @@ class SensorNode(wsn.Node):
                         'hop_count': self.hop_count + 1,
                         'gui': self.id
                     })
+                    
+                    # Track the child CH and router
+                    # Add green router to members (router is a member of this CH)
+                    if green_id not in self.members_table:
+                        self.members_table.append(green_id)
+                        self.log(f"[CH] Added router {green_id} to members_table")
+                    
+                    # Do NOT add yellow to members_table - it will become a child CH, not a member
+                    # Pre-populate child_networks_table (yellow will become CH with this network)
+                    if yellow_id not in self.child_networks_table:
+                        self.child_networks_table[yellow_id] = []
+                    new_network_id = yellow_id  # Network ID is same as CH ID
+                    if new_network_id not in self.child_networks_table[yellow_id]:
+                        self.child_networks_table[yellow_id].append(new_network_id)
+                        self.log(f"[CH] Pre-added child CH {yellow_id} with network {new_network_id}")
                     #self.set_timer('TIMER_PROMOTION_TIMEOUT', 5.0)  # Release after 5s if stuck
                     #self.active_router_promotion = False
                 return
@@ -872,7 +908,6 @@ class SensorNode(wsn.Node):
                         'hop_count': self.hop_count + 1,  # Yellow CH will be one hop further
                         'gui': self.id
                     })
-                    
                     
                     self.log(f"[ROUTER] Promoted to ROUTER, bridging CHs {self.ch_addr} and {yellow_id}")
                 else:
@@ -998,6 +1033,20 @@ class SensorNode(wsn.Node):
                     
                     self.log(f"[ROUTER] Became CH (promoted by router {router_id})")
                     self.send_network_update()
+                    
+                    # Notify parent CH that we became a CH
+                    if self.parent_gui is not None:
+                        ch_created_notice = {
+                            'type': 'CHILD_CH_CREATED',
+                            'child_ch_id': self.id,
+                            'child_network_id': self.ch_addr.net_addr if hasattr(self.ch_addr, 'net_addr') else self.id,
+                            'via_router': router_id,
+                            'dest_gui': self.parent_gui,
+                            'dest': wsn.BROADCAST_ADDR,
+                            'gui': self.id
+                        }
+                        self.send(ch_created_notice)
+                        self.log(f"[CH] Notified parent {self.parent_gui} about CH creation")
         
                     
             if pck['type'] == 'JOIN_REPLY':  # it becomes registered and sends join ack if the message is sent to itself once received join reply
@@ -1192,7 +1241,7 @@ def write_members_table_csv(path="members_table.csv"):
         
         for node in sim.nodes:
             if hasattr(node, "role") and node.role in [Roles.ROOT, Roles.CLUSTER_HEAD]:
-                if hasattr(node, "members_table"):
+                if hasattr(node, "members_table") and node.members_table:  # Check if not empty
                     # Format members
                     members_list = []
                     for member_gui in node.members_table:

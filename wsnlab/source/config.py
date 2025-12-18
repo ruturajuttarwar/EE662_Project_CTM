@@ -43,12 +43,9 @@ MIN_CLUSTER_SIZE = 6  # Minimum registered nodes per cluster head (CH must have 
 YELLOW_NODE_CH_TIMEOUT = 120  # Seconds - base timeout for yellow node to become CH (INCREASED to reduce CH count)
 YELLOW_NODE_CH_TIMEOUT_VARIANCE = 60  # Seconds - random variance added to base timeout (prevents simultaneous promotion)
 MIN_CH_DISTANCE = 60  # Minimum distance between cluster heads (safety check for overlapping)
-ENABLE_CH_HANDOFF = False  # Allow cluster head role to move to better candidates (DISABLED - causes issues)
-CH_HANDOFF_INTERVAL = 200  # Seconds - how often to check for better CH candidates
 
 ## Router Layer properties
 ENABLE_ROUTER_LAYER = True              # Enable router-based cluster expansion
-##ROUTER_PROMOTION_DISTANCE = 0.4         # 0.9 * NODE_TX_RANGE to detect edge nodes
-ROUTER_HEARTBEAT_INTERVAL = 60          # Seconds - router heartbeat interval
-##ROUTER_COLOR = (0.6, 0.2, 0.8)         # Purple/magenta color for routers
+ROUTER_HEARTBEAT_INTERVAL = 20          # Seconds - router heartbeat interval
+
 
