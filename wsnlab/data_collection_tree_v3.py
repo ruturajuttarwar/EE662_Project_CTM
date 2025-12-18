@@ -156,6 +156,7 @@ class SensorNode(wsn.Node):
                 self.set_timer('TIMER_EXPORT_CH_CSV', config.EXPORT_CH_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_NEIGHBOR_CSV', config.EXPORT_NEIGHBOR_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_ROUTING_STATS', 1000)  # Export routing stats periodically
+                self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance at 4000s
 
 
 
@@ -1122,7 +1123,12 @@ class SensorNode(wsn.Node):
                 if hasattr(self, 'yellows_being_promoted'):
                     if len(self.yellows_being_promoted) > 0:
                         self.log(f"[CH] Clearing stuck yellows: {self.yellows_being_promoted}")
-                    self.yellows_being_promoted.clear()            
+                    self.yellows_being_promoted.clear()
+        
+        elif name == 'TIMER_MAINTENANCE':
+            # Network maintenance at 4000 seconds
+            if self.role == Roles.ROOT:
+                self.run_network_maintenance()
 
         elif name == 'TIMER_HEART_BEAT':  # it sends heart beat message once heart beat timer fired
             # Log heartbeat for REGISTERED nodes to debug yellow discovery issues
@@ -1179,6 +1185,142 @@ class SensorNode(wsn.Node):
             if node.id == node_id:
                 return hasattr(node, 'role') and node.role == Roles.REGISTERED
         return False
+
+    ###################
+    def run_network_maintenance(self):
+        """
+        Network maintenance at 4000 seconds
+        - Kill stuck yellow/green pairs that are in infinite retry loops
+        - Demote orphaned routers that aren't bridging any CHs
+        - Clean up invalid entries in tables
+        """
+        now = self.now
+        self.log(f"\n{'='*70}")
+        self.log(f"[MAINTENANCE] Starting network maintenance at {now:.1f}s")
+        self.log(f"{'='*70}\n")
+        
+        killed_yellows = []
+        killed_greens = []
+        demoted_routers = []
+        
+        # Phase 1: Find and kill stuck yellows (any yellow stuck > 1000s)
+        self.log(f"[MAINTENANCE] Phase 1: Identifying stuck yellows...")
+        
+        for yellow in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.UNREGISTERED]:
+            # Check if yellow has been stuck for > 1000 seconds
+            if hasattr(yellow, 'unregistered_since') and yellow.unregistered_since:
+                stuck_time = now - yellow.unregistered_since
+                if stuck_time > 1000:
+                    # Yellow stuck for > 1000 seconds - KILL IT
+                    self.log(f"[MAINTENANCE] Found stuck yellow {yellow.id} (stuck for {stuck_time:.1f}s)")
+                    killed_yellows.append(yellow.id)
+                    
+                    # Mark node as killed
+                    yellow.set_role(Roles.UNDISCOVERED)
+                    
+                    # Stop timers
+                    yellow.kill_timer('TIMER_JOIN_REQUEST')
+                    yellow.kill_timer('TIMER_YELLOW_CH')
+                    yellow.kill_timer('TIMER_HEART_BEAT')
+                    
+                    self.log(f"[MAINTENANCE] Killed stuck yellow {yellow.id}")
+        
+        # Phase 1b: Find and kill greens outside network (no parent)
+        self.log(f"\n[MAINTENANCE] Phase 1b: Identifying greens outside network...")
+        
+        for green in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.REGISTERED]:
+            # Check if green is outside network (no parent CH)
+            if hasattr(green, 'parent_gui') and green.parent_gui is None:
+                self.log(f"[MAINTENANCE] Found green {green.id} outside network (no parent)")
+                killed_greens.append(green.id)
+                
+                # Mark node as killed
+                green.set_role(Roles.UNDISCOVERED)
+                
+                # Stop timers
+                green.kill_timer('TIMER_HEART_BEAT')
+                
+                self.log(f"[MAINTENANCE] Killed green {green.id} (outside network)")
+        
+        # Phase 1c: Find and kill greens connected to routers (orphaned greens)
+        self.log(f"\n[MAINTENANCE] Phase 1c: Identifying greens connected to routers...")
+        
+        for green in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.REGISTERED]:
+            # Check if green's parent is a ROUTER (not a CH)
+            if hasattr(green, 'parent_gui') and green.parent_gui is not None:
+                parent = next((n for n in sim.nodes if n.id == green.parent_gui), None)
+                if parent and hasattr(parent, 'role') and parent.role == Roles.ROUTER:
+                    # Green is connected to a router - this is invalid
+                    self.log(f"[MAINTENANCE] Found green {green.id} connected to router {parent.id}")
+                    
+                    if green.id not in killed_greens:  # Don't double-kill
+                        killed_greens.append(green.id)
+                        
+                        # Mark node as killed
+                        green.set_role(Roles.UNDISCOVERED)
+                        
+                        # Stop timers
+                        green.kill_timer('TIMER_HEART_BEAT')
+                        
+                        self.log(f"[MAINTENANCE] Killed green {green.id} (connected to router)")
+        
+        # Phase 2: Demote orphaned routers
+        self.log(f"\n[MAINTENANCE] Phase 2: Identifying orphaned routers...")
+        
+        for node in sim.nodes:
+            if hasattr(node, 'role') and node.role == Roles.ROUTER:
+                # Check if router is actually bridging two CHs
+                has_valid_child = False
+                
+                if hasattr(node, 'connected_CHs') and len(node.connected_CHs) > 1:
+                    child_ch_id = node.connected_CHs[1]
+                    
+                    # Verify child is actually a CH
+                    for other in sim.nodes:
+                        if other.id == child_ch_id and hasattr(other, 'role'):
+                            if other.role in [Roles.CLUSTER_HEAD, Roles.ROOT]:
+                                has_valid_child = True
+                                break
+                
+                if not has_valid_child:
+                    # Orphaned router - demote to REGISTERED
+                    self.log(f"[MAINTENANCE] Found orphaned router {node.id} (no child CH)")
+                    demoted_routers.append(node.id)
+                    
+                    # Demote to REGISTERED
+                    node.set_role(Roles.REGISTERED)
+                    if hasattr(node, 'connected_CHs'):
+                        node.connected_CHs = []
+                    
+                    # Stop router heartbeat timer
+                    node.kill_timer('TIMER_ROUTER_HB')
+                    
+                    # Start regular heartbeat
+                    node.set_timer('TIMER_HEART_BEAT', config.HEARTH_BEAT_TIME_INTERVAL)
+                    
+                    self.log(f"[MAINTENANCE] Demoted orphaned router {node.id} to REGISTERED")
+        
+        # Phase 3: Clean up members_table entries for killed nodes
+        self.log(f"\n[MAINTENANCE] Phase 3: Cleaning up tables...")
+        
+        all_killed = killed_yellows + killed_greens
+        for node in sim.nodes:
+            if hasattr(node, 'role') and node.role in [Roles.CLUSTER_HEAD, Roles.ROOT]:
+                if hasattr(node, 'members_table'):
+                    original_count = len(node.members_table)
+                    node.members_table = [m for m in node.members_table if m not in all_killed]
+                    removed = original_count - len(node.members_table)
+                    if removed > 0:
+                        self.log(f"[MAINTENANCE] Removed {removed} killed nodes from CH {node.id} members_table")
+        
+        # Summary
+        self.log(f"\n{'='*70}")
+        self.log(f"[MAINTENANCE] Summary:")
+        self.log(f"  - Killed yellows: {len(killed_yellows)} nodes {killed_yellows}")
+        self.log(f"  - Killed greens: {len(killed_greens)} nodes {killed_greens}")
+        self.log(f"  - Demoted routers: {len(demoted_routers)} nodes {demoted_routers}")
+        self.log(f"  - Total nodes cleaned: {len(all_killed) + len(demoted_routers)}")
+        self.log(f"{'='*70}\n")
 
     ###################
     def finish(self):
