@@ -12,6 +12,7 @@ import csv
 import numpy as np
 
 
+
 # Track where each node is placed
 NODE_POS = {}  # {node_id: (x, y)}
 
@@ -153,7 +154,7 @@ class SensorNode(wsn.Node):
                 self.set_timer('TIMER_EXPORT_CH_CSV', config.EXPORT_CH_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_NEIGHBOR_CSV', config.EXPORT_NEIGHBOR_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_ROUTING_STATS', 2000)  # Export routing stats periodically
-                self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance at 4000s
+                self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance 
 
 
 
@@ -743,8 +744,17 @@ class SensorNode(wsn.Node):
                 new_yellow_addr = wsn.Addr(self.ch_addr.net_addr, yellow_id)
                 self.send_join_reply(yellow_id, new_yellow_addr)
                 
-                # Populate members_table
-                if yellow_id not in self.members_table:
+                # Populate members_table (but NOT if yellow is already a CH!)
+                # Check if yellow is a CH before adding
+                yellow_node = next((n for n in sim.nodes if n.id == yellow_id), None)
+                if yellow_node and hasattr(yellow_node, 'role'):
+                    if yellow_node.role == Roles.CLUSTER_HEAD:
+                        self.log(f"[CH] WARNING: Yellow {yellow_id} is already a CH, NOT adding to members_table")
+                    elif yellow_id not in self.members_table:
+                        self.members_table.append(yellow_id)
+                        self.log(f"[CH] Added {yellow_id} to members_table (direct join)")
+                elif yellow_id not in self.members_table:
+                    # Node not found or no role, add anyway
                     self.members_table.append(yellow_id)
                     self.log(f"[CH] Added {yellow_id} to members_table (direct join)")
 
@@ -823,8 +833,6 @@ class SensorNode(wsn.Node):
                     if new_network_id not in self.child_networks_table[yellow_id]:
                         self.child_networks_table[yellow_id].append(new_network_id)
                         self.log(f"[CH] Pre-added child CH {yellow_id} with network {new_network_id}")
-                    #self.set_timer('TIMER_PROMOTION_TIMEOUT', 5.0)  # Release after 5s if stuck
-                    #self.active_router_promotion = False
                 return
 
             
@@ -925,8 +933,6 @@ class SensorNode(wsn.Node):
                         self.send_join_reply(gui, wsn.Addr(self.ch_addr.net_addr,gui))
                     
                     self.log(f"Became CH: sent {len(self.received_JR_guis)} join replies")
-                    # Lock released in BECOME_CH handler instead
-                    # self.active_router_promotion = False
         
         elif self.role == Roles.ROUTER:  # if the node is a router
             if pck['type'] == 'HEART_BEAT':
@@ -1137,7 +1143,6 @@ class SensorNode(wsn.Node):
                     self.yellows_being_promoted.clear()
         
         elif name == 'TIMER_MAINTENANCE':
-            # Network maintenance at 4000 seconds
             if self.role == Roles.ROOT:
                 self.run_network_maintenance()
 
@@ -1200,7 +1205,7 @@ class SensorNode(wsn.Node):
     ###################
     def run_network_maintenance(self):
         """
-        Network maintenance at 4000 seconds
+        Network maintenance
         - Kill stuck yellow/green pairs that are in infinite retry loops
         - Demote orphaned routers that aren't bridging any CHs
         - Clean up invalid entries in tables
@@ -1305,7 +1310,7 @@ class SensorNode(wsn.Node):
                 
                 self.log(f"[MAINTENANCE] Killed green {green.id} (connected to router {router_id})")
         
-        # Phase 1d: Find and kill greens connected to other greens (invalid green-to-green)
+        #  Find and kill greens connected to other greens (invalid green-to-green)
         self.log(f"\n[MAINTENANCE] Phase 1d: Identifying greens connected to other greens...")
         
         for green in [n for n in sim.nodes if hasattr(n, 'role') and n.role == Roles.REGISTERED]:
@@ -1327,6 +1332,69 @@ class SensorNode(wsn.Node):
                         green.kill_timer('TIMER_HEART_BEAT')
                         
                         self.log(f"[MAINTENANCE] Killed green {green.id} (connected to green)")
+        
+        # Phase 1e: Find and kill CHs that are members of other CHs (overlapping CHs)
+        self.log(f"\n[MAINTENANCE] Phase 1e: Identifying overlapping CHs (CH inside another CH)...")
+        
+        killed_overlapping_chs = []
+        killed_orphaned_members = []
+        
+        for parent_ch in [n for n in sim.nodes if hasattr(n, 'role') and n.role in [Roles.CLUSTER_HEAD, Roles.ROOT]]:
+            if hasattr(parent_ch, 'members_table') and parent_ch.members_table:
+                for member_id in parent_ch.members_table:
+                    # Check if this member is actually a CH
+                    member_node = next((n for n in sim.nodes if n.id == member_id), None)
+                    if member_node and hasattr(member_node, 'role'):
+                        if member_node.role == Roles.CLUSTER_HEAD:
+                            # Found a CH in members_table - this is invalid!
+                            # CHs should only be in child_networks_table, not members_table
+                            self.log(f"[MAINTENANCE] Found overlapping CH {member_id} inside CH {parent_ch.id}'s members")
+                            
+                            if member_id not in killed_overlapping_chs:
+                                killed_overlapping_chs.append(member_id)
+                                
+                                # FIRST: Kill all members of this overlapping CH
+                                if hasattr(member_node, 'members_table') and member_node.members_table:
+                                    self.log(f"[MAINTENANCE] Killing {len(member_node.members_table)} members of overlapping CH {member_id}")
+                                    
+                                    for orphaned_member_id in list(member_node.members_table):
+                                        orphaned_node = next((n for n in sim.nodes if n.id == orphaned_member_id), None)
+                                        if orphaned_node and hasattr(orphaned_node, 'role'):
+                                            if orphaned_member_id not in killed_orphaned_members:
+                                                killed_orphaned_members.append(orphaned_member_id)
+                                                
+                                                # Kill the orphaned member
+                                                orphaned_node.set_role(Roles.UNDISCOVERED)
+                                                
+                                                # Clear parent connection
+                                                if hasattr(orphaned_node, 'parent_gui'):
+                                                    orphaned_node.parent_gui = None
+                                                if hasattr(orphaned_node, 'ch_addr'):
+                                                    orphaned_node.ch_addr = None
+                                                
+                                                # Stop timers
+                                                orphaned_node.kill_timer('TIMER_HEART_BEAT')
+                                                
+                                                self.log(f"[MAINTENANCE] Killed orphaned member {orphaned_member_id} (was connected to overlapping CH {member_id})")
+                                
+                                # THEN: Kill the overlapping CH itself
+                                member_node.set_role(Roles.UNDISCOVERED)
+                                
+                                # Clear its CH state
+                                if hasattr(member_node, 'ch_addr'):
+                                    member_node.ch_addr = None
+                                if hasattr(member_node, 'members_table'):
+                                    member_node.members_table = []
+                                if hasattr(member_node, 'child_networks_table'):
+                                    member_node.child_networks_table = {}
+                                
+                                # Stop timers
+                                member_node.kill_timer('TIMER_HEART_BEAT')
+                                
+                                self.log(f"[MAINTENANCE] Killed overlapping CH {member_id} (will reconnect as REGISTERED)")
+                                
+                                # Remove from parent's members_table
+                                parent_ch.members_table.remove(member_id)
         
         # Phase 2: Demote orphaned routers
         self.log(f"\n[MAINTENANCE] Phase 2: Identifying orphaned routers...")
@@ -1367,7 +1435,7 @@ class SensorNode(wsn.Node):
         # Phase 3: Clean up members_table entries for killed nodes
         self.log(f"\n[MAINTENANCE] Phase 3: Cleaning up tables...")
         
-        all_killed = killed_yellows + killed_greens
+        all_killed = killed_yellows + killed_greens + killed_overlapping_chs + killed_orphaned_members
         for node in sim.nodes:
             if hasattr(node, 'role') and node.role in [Roles.CLUSTER_HEAD, Roles.ROOT]:
                 if hasattr(node, 'members_table'):
@@ -1382,6 +1450,8 @@ class SensorNode(wsn.Node):
         self.log(f"[MAINTENANCE] Summary:")
         self.log(f"  - Killed yellows: {len(killed_yellows)} nodes {killed_yellows}")
         self.log(f"  - Killed greens: {len(killed_greens)} nodes {killed_greens}")
+        self.log(f"  - Killed overlapping CHs: {len(killed_overlapping_chs)} nodes {killed_overlapping_chs}")
+        self.log(f"  - Killed orphaned members: {len(killed_orphaned_members)} nodes {killed_orphaned_members}")
         self.log(f"  - Demoted routers: {len(demoted_routers)} nodes {demoted_routers}")
         self.log(f"  - Total nodes cleaned: {len(all_killed) + len(demoted_routers)}")
         self.log(f"{'='*70}\n")
