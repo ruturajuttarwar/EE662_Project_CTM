@@ -11,7 +11,9 @@ import atexit
 import csv
 import numpy as np
 
-
+NETWORK_SEED = 42
+random.seed(NETWORK_SEED)
+np.random.seed(NETWORK_SEED)
 
 # Track where each node is placed
 NODE_POS = {}  # {node_id: (x, y)}
@@ -194,10 +196,10 @@ class SensorNode(wsn.Node):
                 self.scene.nodecolor(self.id, 0, 0, 0)
                 self.set_timer('TIMER_EXPORT_CH_CSV', config.EXPORT_CH_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_NEIGHBOR_CSV', config.EXPORT_NEIGHBOR_CSV_INTERVAL)
-                self.set_timer('TIMER_EXPORT_ROUTING_STATS', 2000)  # Export routing stats periodically
                 self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance
                 if ENABLE_ENERGY_MODEL:
-                    self.set_timer('TIMER_ENERGY_SAMPLE', ENERGY_SAMPLE_INTERVAL)  # Energy sampling 
+                    self.set_timer('TIMER_ENERGY_SAMPLE', ENERGY_SAMPLE_INTERVAL)  # Energy sampling
+
 
     ###################
     # Energy Model Methods
@@ -370,7 +372,7 @@ class SensorNode(wsn.Node):
             self.packets_sent += 1
             tx_time = packet_size / 250000  # 250 kbps data rate
             self.time_in_tx += tx_time
-        
+
         # Call parent send
         super().send(pck)
 
@@ -1354,6 +1356,7 @@ class SensorNode(wsn.Node):
                 self.sample_all_nodes_energy()
                 self.set_timer('TIMER_ENERGY_SAMPLE', ENERGY_SAMPLE_INTERVAL)
 
+
         elif name == 'TIMER_HEART_BEAT':  # it sends heart beat message once heart beat timer fired
             # Log heartbeat for REGISTERED nodes to debug yellow discovery issues
             #if self.role == Roles.REGISTERED:
@@ -1541,71 +1544,10 @@ class SensorNode(wsn.Node):
                         
                         self.log(f"[MAINTENANCE] Killed green {green.id} (connected to green)")
         
-        # Phase 1e: Find and kill CHs that are members of other CHs (overlapping CHs)
-        self.log(f"\n[MAINTENANCE] Phase 1e: Identifying overlapping CHs (CH inside another CH)...")
-        
-        killed_overlapping_chs = []
-        killed_orphaned_members = []
-        
-        for parent_ch in [n for n in sim.nodes if hasattr(n, 'role') and n.role in [Roles.CLUSTER_HEAD, Roles.ROOT]]:
-            if hasattr(parent_ch, 'members_table') and parent_ch.members_table:
-                for member_id in parent_ch.members_table:
-                    # Check if this member is actually a CH
-                    member_node = next((n for n in sim.nodes if n.id == member_id), None)
-                    if member_node and hasattr(member_node, 'role'):
-                        if member_node.role == Roles.CLUSTER_HEAD:
-                            # Found a CH in members_table - this is invalid!
-                            # CHs should only be in child_networks_table, not members_table
-                            self.log(f"[MAINTENANCE] Found overlapping CH {member_id} inside CH {parent_ch.id}'s members")
-                            
-                            if member_id not in killed_overlapping_chs:
-                                killed_overlapping_chs.append(member_id)
-                                
-                                # FIRST: Kill all members of this overlapping CH
-                                if hasattr(member_node, 'members_table') and member_node.members_table:
-                                    self.log(f"[MAINTENANCE] Killing {len(member_node.members_table)} members of overlapping CH {member_id}")
-                                    
-                                    for orphaned_member_id in list(member_node.members_table):
-                                        orphaned_node = next((n for n in sim.nodes if n.id == orphaned_member_id), None)
-                                        if orphaned_node and hasattr(orphaned_node, 'role'):
-                                            if orphaned_member_id not in killed_orphaned_members:
-                                                killed_orphaned_members.append(orphaned_member_id)
-                                                
-                                                # Kill the orphaned member
-                                                orphaned_node.set_role(Roles.UNDISCOVERED)
-                                                
-                                                # Clear parent connection
-                                                if hasattr(orphaned_node, 'parent_gui'):
-                                                    orphaned_node.parent_gui = None
-                                                if hasattr(orphaned_node, 'ch_addr'):
-                                                    orphaned_node.ch_addr = None
-                                                
-                                                # Stop timers
-                                                orphaned_node.kill_timer('TIMER_HEART_BEAT')
-                                                
-                                                self.log(f"[MAINTENANCE] Killed orphaned member {orphaned_member_id} (was connected to overlapping CH {member_id})")
-                                
-                                # THEN: Kill the overlapping CH itself
-                                member_node.set_role(Roles.UNDISCOVERED)
-                                
-                                # Clear its CH state
-                                if hasattr(member_node, 'ch_addr'):
-                                    member_node.ch_addr = None
-                                if hasattr(member_node, 'members_table'):
-                                    member_node.members_table = []
-                                if hasattr(member_node, 'child_networks_table'):
-                                    member_node.child_networks_table = {}
-                                
-                                # Stop timers
-                                member_node.kill_timer('TIMER_HEART_BEAT')
-                                
-                                self.log(f"[MAINTENANCE] Killed overlapping CH {member_id} (will reconnect as REGISTERED)")
-                                
-                                # Remove from parent's members_table
-                                parent_ch.members_table.remove(member_id)
-        
         # Phase 2: Demote orphaned routers
         self.log(f"\n[MAINTENANCE] Phase 2: Identifying orphaned routers...")
+        
+        killed_orphaned_members = []  # Initialize for Phase 3
         
         for node in sim.nodes:
             if hasattr(node, 'role') and node.role == Roles.ROUTER:
@@ -1643,7 +1585,7 @@ class SensorNode(wsn.Node):
         # Phase 3: Clean up members_table entries for killed nodes
         self.log(f"\n[MAINTENANCE] Phase 3: Cleaning up tables...")
         
-        all_killed = killed_yellows + killed_greens + killed_overlapping_chs + killed_orphaned_members
+        all_killed = killed_yellows + killed_greens + killed_orphaned_members
         for node in sim.nodes:
             if hasattr(node, 'role') and node.role in [Roles.CLUSTER_HEAD, Roles.ROOT]:
                 if hasattr(node, 'members_table'):
@@ -1658,7 +1600,6 @@ class SensorNode(wsn.Node):
         self.log(f"[MAINTENANCE] Summary:")
         self.log(f"  - Killed yellows: {len(killed_yellows)} nodes {killed_yellows}")
         self.log(f"  - Killed greens: {len(killed_greens)} nodes {killed_greens}")
-        self.log(f"  - Killed overlapping CHs: {len(killed_overlapping_chs)} nodes {killed_overlapping_chs}")
         self.log(f"  - Killed orphaned members: {len(killed_orphaned_members)} nodes {killed_orphaned_members}")
         self.log(f"  - Demoted routers: {len(demoted_routers)} nodes {demoted_routers}")
         self.log(f"  - Total nodes cleaned: {len(all_killed) + len(demoted_routers)}")
@@ -1951,7 +1892,7 @@ def export_final_stats():
             print(f"\nEnergy Statistics:")
             print(f"  Alive nodes: {alive_nodes}/{total_nodes} ({alive_nodes/total_nodes*100:.1f}%)")
             print(f"  Energy samples collected: {len(ENERGY_SAMPLES)}")
-        
+          
     except Exception as e:
         print(f"Error exporting tables: {e}")
 

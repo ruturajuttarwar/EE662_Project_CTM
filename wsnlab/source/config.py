@@ -34,7 +34,7 @@ NEIGHBOR_TIMEOUT = 30  # seconds - remove neighbors that haven't sent heartbeat 
 ## Multi-Hop Neighbor Discovery properties
 ENABLE_MULTIHOP_NEIGHBORS = True  # Enable multi-hop neighbor table sharing
 MAX_NEIGHBOR_HOPS = 2  # Maximum hops for neighbor discovery (1=direct only, 2=2-hop, etc.)
-NEIGHBOR_SHARE_INTERVAL = 2000  # seconds - how often to broadcast neighbor table
+NEIGHBOR_SHARE_INTERVAL = 500  # seconds - how often to broadcast neighbor table
 NEIGHBOR_SHARE_TTL = 3  # Maximum hops for neighbor table sharing messages
 MULTIHOP_NEIGHBOR_TIMEOUT = 45  # seconds - multi-hop neighbors expire faster than direct neighbors
 
@@ -60,3 +60,10 @@ SLEEP_ENERGY_PER_SECOND = 0.000001     # Energy consumed per second while sleepi
 ENABLE_PACKET_LOSS = True              # Enable packet loss simulation
 PACKET_LOSS_PROBABILITY = 0.1          # Probability that a packet is lost during transmission (0.0-1.0)
 ENERGY_SAMPLE_INTERVAL = 100           # Seconds - how often to sample energy state for CSV export
+
+
+# Node Failure Simulation
+ENABLE_NODE_FAILURE = True              # Enable random node failure simulation 
+NODE_DOWNTIME_AFTER_CONNECTED = 2000    # Seconds - when ROOT checks to schedule node failures
+NUMBER_OF_NODES_TO_FAIL = 5             # Number of random nodes to fail during simulation
+NODE_RECOVERY_TIME_AFTER_DOWNTIME = 200 # Seconds - time node stays down before recovery
