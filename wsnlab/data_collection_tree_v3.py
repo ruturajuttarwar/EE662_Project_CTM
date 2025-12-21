@@ -19,6 +19,9 @@ NODE_POS = {}  # {node_id: (x, y)}
 # Role tracking
 ROLE_COUNTS = Counter()  # live tally per Roles enum
 
+# Energy tracking (global list for CSV export)
+ENERGY_SAMPLES = []  # Stores energy samples over time
+
 
 Roles = Enum('Roles', 'UNDISCOVERED UNREGISTERED ROOT REGISTERED CLUSTER_HEAD ROUTER')
 """Enumeration of roles"""
@@ -40,6 +43,18 @@ YELLOW_NODE_CH_TIMEOUT_VARIANCE = getattr(config, 'YELLOW_NODE_CH_TIMEOUT_VARIAN
 # Router Layer Configuration (from config)
 ENABLE_ROUTER_LAYER = getattr(config, 'ENABLE_ROUTER_LAYER', True)
 ROUTER_HEARTBEAT_INTERVAL = getattr(config, 'ROUTER_HEARTBEAT_INTERVAL', 60)
+
+# Energy Model Configuration (from config)
+ENABLE_ENERGY_MODEL = getattr(config, 'ENABLE_ENERGY_MODEL', False)
+INITIAL_ENERGY_JOULES = getattr(config, 'INITIAL_ENERGY_JOULES', 10000)
+TX_ENERGY_PER_BYTE = getattr(config, 'TX_ENERGY_PER_BYTE', 0.0001)
+RX_ENERGY_PER_BYTE = getattr(config, 'RX_ENERGY_PER_BYTE', 0.00005)
+IDLE_ENERGY_PER_SECOND = getattr(config, 'IDLE_ENERGY_PER_SECOND', 0.00001)
+SLEEP_ENERGY_PER_SECOND = getattr(config, 'SLEEP_ENERGY_PER_SECOND', 0.000001)
+ENABLE_PACKET_LOSS = getattr(config, 'ENABLE_PACKET_LOSS', False)
+PACKET_LOSS_PROBABILITY = getattr(config, 'PACKET_LOSS_PROBABILITY', 0.1)
+ENERGY_SAMPLE_INTERVAL = getattr(config, 'ENERGY_SAMPLE_INTERVAL', 100)
+
 
 
 
@@ -110,6 +125,32 @@ class SensorNode(wsn.Node):
         # Multi-Hop Neighbor Discovery
         self.multihop_neighbors = {}  # 2-hop and beyond neighbors
         self.neighbor_share_sequence = 0  # Sequence number for neighbor table updates
+        
+        # Energy Model
+        if ENABLE_ENERGY_MODEL:
+            self.initial_energy = INITIAL_ENERGY_JOULES
+            self.remaining_energy = INITIAL_ENERGY_JOULES
+            self.is_alive = True
+            
+            # Time tracking per state
+            self.time_in_tx = 0.0
+            self.time_in_rx = 0.0
+            self.time_in_idle = 0.0
+            self.time_in_sleep = 0.0
+            self.last_energy_update = 0.0  # Will be set to self.now on first use
+            
+            # Energy consumption by source
+            self.energy_tx = 0.0
+            self.energy_rx = 0.0
+            self.energy_idle = 0.0
+            self.energy_sleep = 0.0
+            
+            # Packet statistics
+            self.packets_sent = 0
+            self.packets_received = 0
+            self.packets_lost = 0
+            self.bytes_sent = 0
+            self.bytes_received = 0
 
     ###################
     def run(self):
@@ -154,9 +195,113 @@ class SensorNode(wsn.Node):
                 self.set_timer('TIMER_EXPORT_CH_CSV', config.EXPORT_CH_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_NEIGHBOR_CSV', config.EXPORT_NEIGHBOR_CSV_INTERVAL)
                 self.set_timer('TIMER_EXPORT_ROUTING_STATS', 2000)  # Export routing stats periodically
-                self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance 
+                self.set_timer('TIMER_MAINTENANCE', 1000)  # Network maintenance
+                if ENABLE_ENERGY_MODEL:
+                    self.set_timer('TIMER_ENERGY_SAMPLE', ENERGY_SAMPLE_INTERVAL)  # Energy sampling 
 
-
+    ###################
+    # Energy Model Methods
+    ###################
+    
+    def calculate_packet_size(self, packet):
+        """Calculate packet size in bytes for energy consumption"""
+        if not ENABLE_ENERGY_MODEL:
+            return 0
+        
+        size = 20  # Base header (type, source, dest, etc.)
+        
+        msg_type = packet.get('type', '')
+        if msg_type == 'HEART_BEAT':
+            size += 50  # Position, role, hop count, network info
+        elif msg_type in ['JOIN_REQUEST', 'JOIN_REPLY', 'JOIN_ACK']:
+            size += 35
+        elif msg_type in ['NETWORK_REQUEST', 'NETWORK_REPLY']:
+            size += 40
+        elif msg_type == 'BECOME_CH':
+            size += 45
+        elif msg_type == 'DATA':
+            size += packet.get('payload_size', 100)
+        elif msg_type == 'ROUTER_NOMINATION':
+            size += 30
+        elif msg_type == 'NEIGHBOR_SHARE':
+            size += 60  # Neighbor table data
+        else:
+            size += 30  # Default for other message types
+        
+        return size
+    
+    def consume_energy(self, amount, source):
+        """Consume energy and track by source (TX/RX/IDLE/SLEEP)"""
+        if not ENABLE_ENERGY_MODEL or not hasattr(self, 'is_alive') or not self.is_alive:
+            return
+        
+        self.remaining_energy -= amount
+        
+        # Track by source
+        if source == 'TX':
+            self.energy_tx += amount
+        elif source == 'RX':
+            self.energy_rx += amount
+        elif source == 'IDLE':
+            self.energy_idle += amount
+        elif source == 'SLEEP':
+            self.energy_sleep += amount
+        
+        # Check if node dies from energy depletion
+        if self.remaining_energy <= 0:
+            self.die_from_energy_depletion()
+    
+    def die_from_energy_depletion(self):
+        """Node runs out of energy and dies permanently"""
+        if not hasattr(self, 'is_alive'):
+            return
+        
+        self.is_alive = False
+        self.remaining_energy = 0
+        
+        # Turn off radio - set to UNDISCOVERED
+        self.set_role(Roles.UNDISCOVERED, recolor=False)
+        
+        # Stop all timers
+        self.kill_timer('TIMER_HEART_BEAT')
+        self.kill_timer('TIMER_JOIN_REQUEST')
+        self.kill_timer('TIMER_YELLOW_CH')
+        self.kill_timer('TIMER_ROUTER_HB')
+        self.kill_timer('TIMER_NEIGHBOR_SHARE')
+        
+        # Log death
+        self.log(f"[ENERGY] Node {self.id} DIED (energy depleted) at {self.now:.2f}s")
+        
+        # Visual indication - gray for dead
+        self.scene.nodecolor(self.id, 0.5, 0.5, 0.5)
+    
+    def update_idle_energy(self):
+        """Update idle/sleep energy consumption based on time elapsed"""
+        if not ENABLE_ENERGY_MODEL or not hasattr(self, 'is_alive') or not self.is_alive:
+            return
+        
+        # Initialize last_energy_update if not set
+        if self.last_energy_update == 0.0:
+            self.last_energy_update = self.now
+            return
+        
+        time_delta = self.now - self.last_energy_update
+        self.last_energy_update = self.now
+        
+        if time_delta <= 0:
+            return
+        
+        # Determine state (sleep or idle)
+        if self.role == Roles.UNDISCOVERED:
+            # Sleeping
+            energy = time_delta * SLEEP_ENERGY_PER_SECOND
+            self.consume_energy(energy, 'SLEEP')
+            self.time_in_sleep += time_delta
+        else:
+            # Idle listening
+            energy = time_delta * IDLE_ENERGY_PER_SECOND
+            self.consume_energy(energy, 'IDLE')
+            self.time_in_idle += time_delta
 
 
     
@@ -165,7 +310,13 @@ class SensorNode(wsn.Node):
             self.kill_all_timers()
             self.log('I became UNREGISTERED')
         self.scene.nodecolor(self.id, 1, 1, 0)
-        self.erase_parent()
+        # Safely erase parent link if it exists
+        if self.parent_gui is not None:
+            try:
+                self.erase_parent()
+            except (KeyError, ValueError):
+                # Link doesn't exist in visualization, that's okay
+                pass
         self.addr = None
         self.ch_addr = None
         self.parent_gui = None
@@ -189,6 +340,39 @@ class SensorNode(wsn.Node):
         
         # Set adaptive timer to become CH if stuck yellow too long
         self.set_timer('TIMER_YELLOW_CH', self.adaptive_ch_timeout)
+    
+    ###################
+    # Override send() to track TX energy
+    ###################
+    
+    def send(self, pck):
+        """Override send to track TX energy consumption"""
+        # Check if node is alive
+        if ENABLE_ENERGY_MODEL and hasattr(self, 'is_alive') and not self.is_alive:
+            return  # Dead nodes can't send
+        
+        # Update idle energy before TX
+        if ENABLE_ENERGY_MODEL:
+            self.update_idle_energy()
+        
+        # Check packet loss
+        if ENABLE_PACKET_LOSS and hasattr(self, 'packets_lost'):
+            if random.random() < PACKET_LOSS_PROBABILITY:
+                self.packets_lost += 1
+                return  # Packet lost
+        
+        # Calculate TX energy
+        if ENABLE_ENERGY_MODEL and hasattr(self, 'bytes_sent'):
+            packet_size = self.calculate_packet_size(pck)
+            tx_energy = packet_size * TX_ENERGY_PER_BYTE
+            self.consume_energy(tx_energy, 'TX')
+            self.bytes_sent += packet_size
+            self.packets_sent += 1
+            tx_time = packet_size / 250000  # 250 kbps data rate
+            self.time_in_tx += tx_time
+        
+        # Call parent send
+        super().send(pck)
 
     ###################
     def update_neighbor(self, pck):
@@ -698,6 +882,24 @@ class SensorNode(wsn.Node):
         Returns:
 
         """
+        # Energy Model: Check if node is alive
+        if ENABLE_ENERGY_MODEL and hasattr(self, 'is_alive') and not self.is_alive:
+            return  # Dead nodes can't receive
+        
+        # Energy Model: Update idle energy before RX
+        if ENABLE_ENERGY_MODEL:
+            self.update_idle_energy()
+        
+        # Energy Model: Calculate RX energy
+        if ENABLE_ENERGY_MODEL and hasattr(self, 'bytes_received'):
+            packet_size = self.calculate_packet_size(pck)
+            rx_energy = packet_size * RX_ENERGY_PER_BYTE
+            self.consume_energy(rx_energy, 'RX')
+            self.bytes_received += packet_size
+            self.packets_received += 1
+            rx_time = packet_size / 250000  # 250 kbps data rate
+            self.time_in_rx += rx_time
+        
         # Multi-Hop: Process neighbor table sharing
         if pck.get('type') == 'NEIGHBOR_SHARE':
             self.process_neighbor_share(pck)
@@ -1145,6 +1347,12 @@ class SensorNode(wsn.Node):
         elif name == 'TIMER_MAINTENANCE':
             if self.role == Roles.ROOT:
                 self.run_network_maintenance()
+        
+        elif name == 'TIMER_ENERGY_SAMPLE':
+            # Energy sampling (ROOT only)
+            if self.role == Roles.ROOT and ENABLE_ENERGY_MODEL:
+                self.sample_all_nodes_energy()
+                self.set_timer('TIMER_ENERGY_SAMPLE', ENERGY_SAMPLE_INTERVAL)
 
         elif name == 'TIMER_HEART_BEAT':  # it sends heart beat message once heart beat timer fired
             # Log heartbeat for REGISTERED nodes to debug yellow discovery issues
@@ -1457,6 +1665,36 @@ class SensorNode(wsn.Node):
         self.log(f"{'='*70}\n")
 
     ###################
+    def sample_all_nodes_energy(self):
+        """Sample energy state of all nodes for CSV export (ROOT only)"""
+        if not ENABLE_ENERGY_MODEL:
+            return
+        
+        for node in sim.nodes:
+            if hasattr(node, 'remaining_energy'):
+                # Update idle energy before sampling
+                node.update_idle_energy()
+                
+                sample = {
+                    'timestamp': self.now,
+                    'node_id': node.id,
+                    'role': node.role.name if hasattr(node, 'role') else 'UNKNOWN',
+                    'remaining_energy': node.remaining_energy,
+                    'energy_consumed': node.initial_energy - node.remaining_energy,
+                    'energy_tx': node.energy_tx,
+                    'energy_rx': node.energy_rx,
+                    'energy_idle': node.energy_idle,
+                    'energy_sleep': node.energy_sleep,
+                    'is_alive': node.is_alive,
+                    'packets_sent': node.packets_sent,
+                    'packets_received': node.packets_received,
+                    'packets_lost': node.packets_lost,
+                    'bytes_sent': node.bytes_sent,
+                    'bytes_received': node.bytes_received
+                }
+                ENERGY_SAMPLES.append(sample)
+
+    ###################
     def finish(self):
         """Called at end of simulation - print CTM-AdHoc routing statistics"""
         if ENABLE_HYBRID_ROUTING and sum(self.routing_stats.values()) > 0:
@@ -1557,6 +1795,88 @@ def write_neighbors_table_csv(path="neighbors_table.csv"):
                 w.writerow([node.id, role_name, neighbor_count, neighbors_str])
 
 
+def write_energy_timeline_csv(path="energy_timeline.csv"):
+    """Export energy timeline data for plotting"""
+    if not ENABLE_ENERGY_MODEL or not ENERGY_SAMPLES:
+        return
+    
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "timestamp", "node_id", "role", "remaining_energy", "energy_consumed",
+            "energy_tx", "energy_rx", "energy_idle", "energy_sleep",
+            "is_alive", "packets_sent", "packets_received", "packets_lost",
+            "bytes_sent", "bytes_received"
+        ])
+        
+        for sample in ENERGY_SAMPLES:
+            w.writerow([
+                sample['timestamp'],
+                sample['node_id'],
+                sample['role'],
+                sample['remaining_energy'],
+                sample['energy_consumed'],
+                sample['energy_tx'],
+                sample['energy_rx'],
+                sample['energy_idle'],
+                sample['energy_sleep'],
+                sample['is_alive'],
+                sample['packets_sent'],
+                sample['packets_received'],
+                sample['packets_lost'],
+                sample['bytes_sent'],
+                sample['bytes_received']
+            ])
+
+
+def write_energy_summary_csv(path="energy_summary.csv"):
+    """Export per-node energy summary at end of simulation"""
+    if not ENABLE_ENERGY_MODEL:
+        return
+    
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "node_id", "final_role", "initial_energy", "remaining_energy",
+            "total_consumed", "energy_tx", "energy_rx", "energy_idle", "energy_sleep",
+            "time_tx", "time_rx", "time_idle", "time_sleep",
+            "packets_sent", "packets_received", "packets_lost",
+            "bytes_sent", "bytes_received", "is_alive", "death_time"
+        ])
+        
+        for node in sim.nodes:
+            if hasattr(node, 'remaining_energy'):
+                # Update final idle energy
+                node.update_idle_energy()
+                
+                death_time = ''
+                if hasattr(node, 'is_alive') and not node.is_alive:
+                    death_time = node.now
+                
+                w.writerow([
+                    node.id,
+                    node.role.name if hasattr(node, 'role') else 'UNKNOWN',
+                    node.initial_energy,
+                    node.remaining_energy,
+                    node.initial_energy - node.remaining_energy,
+                    node.energy_tx,
+                    node.energy_rx,
+                    node.energy_idle,
+                    node.energy_sleep,
+                    node.time_in_tx,
+                    node.time_in_rx,
+                    node.time_in_idle,
+                    node.time_in_sleep,
+                    node.packets_sent,
+                    node.packets_received,
+                    node.packets_lost,
+                    node.bytes_sent,
+                    node.bytes_received,
+                    node.is_alive,
+                    death_time
+                ])
+
+
 ###########################################################
 def create_network(node_class, number_of_nodes=100):
     """Creates given number of nodes at random positions with random arrival times.
@@ -1617,6 +1937,21 @@ def export_final_stats():
         print("Exported: child_networks_table.csv")
         print("Exported: members_table.csv")
         print("Exported: neighbors_table.csv")
+        
+        # Export energy data if enabled
+        if ENABLE_ENERGY_MODEL:
+            write_energy_timeline_csv("energy_timeline.csv")
+            write_energy_summary_csv("energy_summary.csv")
+            print("Exported: energy_timeline.csv")
+            print("Exported: energy_summary.csv")
+            
+            # Print energy statistics
+            alive_nodes = sum(1 for node in sim.nodes if hasattr(node, 'is_alive') and node.is_alive)
+            total_nodes = len(sim.nodes)
+            print(f"\nEnergy Statistics:")
+            print(f"  Alive nodes: {alive_nodes}/{total_nodes} ({alive_nodes/total_nodes*100:.1f}%)")
+            print(f"  Energy samples collected: {len(ENERGY_SAMPLES)}")
+        
     except Exception as e:
         print(f"Error exporting tables: {e}")
 

@@ -20,6 +20,8 @@
 - **Network Maintenance** - Automatic cleanup at 4000s
 - **Prevention Logic** - Stops invalid connections at source
 - **Enhanced Diagnostics** - Comprehensive logging
+- **Energy Model** - Complete energy consumption tracking (NEW)
+- **Packet Loss Simulation** - Realistic network conditions (NEW)
 
 ---
 
@@ -56,7 +58,42 @@
 
 ---
 
-### 2. Three-Table Routing System
+### 2. Energy Model (NEW)
+
+**Complete energy consumption tracking with node lifetime simulation:**
+
+#### **Key Features:**
+- ✅ Per-node energy tracking (TX, RX, idle, sleep)
+- ✅ Node death when energy depleted
+- ✅ Packet loss simulation
+- ✅ Periodic energy sampling (every 100s)
+- ✅ Two CSV outputs for analysis
+- ✅ Real-time energy statistics
+
+#### **Energy Consumption:**
+```
+TX:    0.0001 J/byte  (transmitting packets)
+RX:    0.00005 J/byte (receiving packets)
+Idle:  0.001 J/s      (listening for packets)
+Sleep: 0.0001 J/s     (undiscovered state)
+```
+
+#### **Node Lifetime:**
+- Initial energy: 10,000 Joules (configurable)
+- Nodes die when energy reaches 0
+- Dead nodes cannot send/receive
+- Network adapts to node failures
+
+#### **Data Collection:**
+- **energy_timeline.csv** - Time-series data every 100s
+- **energy_summary.csv** - Per-node final statistics
+- Tracks: energy consumed, packets sent/received, node death time
+
+---
+
+### 3. Three-Table Routing System
+
+### 3. Three-Table Routing System
 
 #### **neighbors_table.csv** - Physical Connectivity
 ```csv
@@ -113,7 +150,7 @@ node_id,node_role,child_count,children
 
 ---
 
-### 3. Router Layer - Enhanced
+### 4. Router Layer - Enhanced
 
 **Key Improvements:**
 - Boolean lock system (simple, effective)
@@ -152,7 +189,7 @@ elif name == 'TIMER_PROMOTION_LOCK_TIMEOUT':
 
 ---
 
-### 4. Network Maintenance (4000s)
+### 5. Network Maintenance (4000s)
 
 **Automatic cleanup of invalid network states:**
 
@@ -214,7 +251,7 @@ elif name == 'TIMER_PROMOTION_LOCK_TIMEOUT':
 
 ---
 
-### 5. Prevention Logic
+### 6. Prevention Logic
 
 **Prevent Invalid Connections at Source:**
 
@@ -233,6 +270,77 @@ if pck['type'] == 'JOIN_REPLY':
 - Stops greens from connecting to routers
 - Prevents invalid hierarchy at source
 - Reduces maintenance workload
+
+---
+
+### 7. Energy Model (NEW)
+
+**Comprehensive energy consumption tracking and node lifetime simulation:**
+
+#### **Energy Consumption Sources**
+
+1. **Transmission (TX)** - Energy per byte transmitted
+   - Configurable: `TX_ENERGY_PER_BYTE = 0.0001 J/byte`
+   - Tracks: Packet size × energy rate
+   - Includes: All broadcasts and unicasts
+
+2. **Reception (RX)** - Energy per byte received
+   - Configurable: `RX_ENERGY_PER_BYTE = 0.00005 J/byte`
+   - Tracks: Received packet size × energy rate
+   - Includes: All incoming packets
+
+3. **Idle/Listening** - Energy while waiting for packets
+   - Configurable: `IDLE_ENERGY_PER_SECOND = 0.001 J/s`
+   - Tracks: Time spent in active listening state
+   - Applied: When node is awake but not TX/RX
+
+4. **Sleep** - Energy while undiscovered
+   - Configurable: `SLEEP_ENERGY_PER_SECOND = 0.0001 J/s`
+   - Tracks: Time before node joins network
+   - Applied: UNDISCOVERED state only
+
+#### **Node Death Handling**
+
+When a node's energy reaches zero:
+```python
+def die_from_energy_depletion(self):
+    self.is_alive = False
+    self.log(f"[ENERGY] Node {self.id} DIED - Energy depleted!")
+    # Dead nodes:
+    # - Cannot send packets
+    # - Cannot receive packets
+    # - Are removed from routing tables
+```
+
+#### **Packet Loss Simulation**
+
+Optional packet loss for realistic network conditions:
+```python
+ENABLE_PACKET_LOSS = True
+PACKET_LOSS_PROBABILITY = 0.05  # 5% loss rate
+```
+
+**Features:**
+- Random packet drops before transmission
+- Lost packets don't consume TX energy
+- Tracks packet loss statistics per node
+
+#### **Energy Sampling**
+
+Periodic energy snapshots for analysis:
+- **Frequency:** Every 100 seconds (configurable)
+- **Trigger:** ROOT node timer
+- **Scope:** All nodes in network
+- **Output:** `energy_timeline.csv`
+
+#### **Energy Statistics**
+
+At simulation end, displays:
+```
+Energy Statistics:
+  Alive nodes: 95/100 (95.0%)
+  Energy samples collected: 500
+```
 
 ---
 
@@ -282,6 +390,23 @@ ENABLE_MULTIHOP_NEIGHBORS = True        # Multi-hop neighbor discovery
 NEIGHBOR_TIMEOUT = 30                   # Remove stale neighbors (seconds)
 NEIGHBOR_SHARE_INTERVAL = 30            # Share neighbor table interval
 MAX_HOP_COUNT = 2                       # Maximum hop count for multi-hop
+```
+
+### Energy Model (NEW)
+```python
+ENABLE_ENERGY_MODEL = True              # Enable energy consumption tracking
+INITIAL_ENERGY_JOULES = 10000           # Initial energy per node (Joules)
+TX_ENERGY_PER_BYTE = 0.0001            # Energy per byte transmitted (J/byte)
+RX_ENERGY_PER_BYTE = 0.00005           # Energy per byte received (J/byte)
+IDLE_ENERGY_PER_SECOND = 0.001         # Energy while idle/listening (J/s)
+SLEEP_ENERGY_PER_SECOND = 0.0001       # Energy while sleeping (J/s)
+ENERGY_SAMPLE_INTERVAL = 100            # Sample energy every N seconds
+```
+
+### Packet Loss Simulation (NEW)
+```python
+ENABLE_PACKET_LOSS = False              # Enable packet loss simulation
+PACKET_LOSS_PROBABILITY = 0.05          # 5% packet loss rate
 ```
 
 ### Maintenance
@@ -340,6 +465,47 @@ node_id,node_role,child_count,children
 81,ROOT,3,"73(CLUSTER_HEAD)[73];92(CLUSTER_HEAD)[92]"
 ```
 
+### Energy Model Output (NEW - if ENABLE_ENERGY_MODEL = True)
+
+**4. energy_timeline.csv** - Time-series energy data
+```csv
+timestamp,node_id,role,remaining_energy,energy_consumed,energy_tx,energy_rx,energy_idle,energy_sleep,is_alive,packets_sent,packets_received,packets_lost,bytes_sent,bytes_received
+100.0,1,ROOT,9950.5,49.5,30.2,15.3,4.0,0.0,True,150,200,5,15000,20000
+200.0,1,ROOT,9901.2,98.8,60.5,30.1,8.2,0.0,True,300,400,8,30000,40000
+```
+
+**Contains:**
+- Energy snapshots every 100 seconds (configurable)
+- Per-node energy breakdown (TX, RX, idle, sleep)
+- Packet statistics (sent, received, lost)
+- Node alive status
+
+**Use For:**
+- Plotting energy consumption over time
+- Identifying energy-hungry nodes
+- Analyzing network lifetime
+- Detecting node failures
+
+**5. energy_summary.csv** - Per-node final statistics
+```csv
+node_id,final_role,initial_energy,remaining_energy,total_consumed,energy_tx,energy_rx,energy_idle,energy_sleep,time_tx,time_rx,time_idle,time_sleep,packets_sent,packets_received,packets_lost,bytes_sent,bytes_received,is_alive,death_time
+1,ROOT,10000,8500.5,1499.5,800.2,400.3,250.0,49.0,120.5,180.2,2500.0,1199.3,1500,2000,25,150000,200000,True,
+5,CLUSTER_HEAD,10000,0.0,10000,5000.2,3000.1,1800.0,199.7,250.3,350.1,1800.0,2599.6,2500,3500,50,250000,350000,False,3456.7
+```
+
+**Contains:**
+- Final energy state of all nodes
+- Total energy consumed by category
+- Time spent in each state
+- Complete packet statistics
+- Node death time (if depleted)
+
+**Use For:**
+- Network lifetime analysis
+- Energy efficiency comparison
+- Identifying bottleneck nodes
+- Role-based energy consumption analysis
+
 ### Log File
 
 **simulation_log.txt** - Complete event log
@@ -347,6 +513,7 @@ node_id,node_role,child_count,children
 - Router promotions
 - Maintenance actions
 - Routing decisions
+- Energy depletion events (if enabled)
 
 ---
 
@@ -414,6 +581,27 @@ cat child_networks_table.csv
 # (manually trace from ROOT to deepest CH)
 ```
 
+### Check Energy Statistics (NEW)
+```bash
+# View energy timeline
+cat energy_timeline.csv
+
+# Find nodes that died
+awk -F',' '$10=="False" {print $2}' energy_summary.csv
+
+# Calculate average energy consumption
+awk -F',' 'NR>1 {sum+=$5; count++} END {print sum/count}' energy_summary.csv
+
+# Find most energy-consuming node
+sort -t',' -k5 -rn energy_summary.csv | head -2
+
+# Count alive vs dead nodes
+awk -F',' 'NR>1 {if($19=="True") alive++; else dead++} END {print "Alive:",alive,"Dead:",dead}' energy_summary.csv
+
+# Plot energy over time (requires gnuplot)
+gnuplot -e "set datafile separator ','; set xlabel 'Time (s)'; set ylabel 'Energy (J)'; plot 'energy_timeline.csv' using 1:4 with lines title 'Node Energy'"
+```
+
 ### Check Maintenance Actions
 ```bash
 # Search for maintenance in log
@@ -424,6 +612,9 @@ grep "Killed" simulation_log.txt | wc -l
 
 # Count demoted routers
 grep "Demoted" simulation_log.txt | wc -l
+
+# Check energy depletion events
+grep "DIED - Energy depleted" simulation_log.txt
 ```
 
 ---
@@ -449,6 +640,22 @@ grep "Demoted" simulation_log.txt | wc -l
 ### Issue: Network Not Growing
 **Cause:** Lock stuck, timeout not working  
 **Fix:** Check for "Promotion lock timeout" messages at 2-second intervals
+
+### Issue: No Energy Data Generated (NEW)
+**Cause:** ENABLE_ENERGY_MODEL = False  
+**Fix:** Set to True in config.py
+
+### Issue: All Nodes Die Too Quickly (NEW)
+**Cause:** Energy parameters too aggressive  
+**Fix:** Increase INITIAL_ENERGY_JOULES or decrease energy consumption rates
+
+### Issue: No Nodes Die (NEW)
+**Cause:** Energy parameters too conservative  
+**Fix:** Decrease INITIAL_ENERGY_JOULES or increase energy consumption rates
+
+### Issue: Energy Timeline CSV Empty (NEW)
+**Cause:** Simulation ended before first sample  
+**Fix:** Check ENERGY_SAMPLE_INTERVAL (default 100s), run simulation longer
 
 ---
 
@@ -578,12 +785,13 @@ This simulation implements the **CTM-AdHoc protocol** for wireless sensor networ
 
 ## Status
 
-**Version:** 3.0  
+**Version:** 3.1  
 **Status:** Production Ready  
 **Last Updated:** December 2024  
 **Tested:** 100 nodes, 5000 seconds, multiple runs  
 **Coverage:** ~95% nodes connected  
 **Stability:** Self-healing with maintenance  
+**New Features:** Energy model with node lifetime simulation
 
 ---
 
