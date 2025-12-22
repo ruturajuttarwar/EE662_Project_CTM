@@ -53,8 +53,8 @@ ROUTER_HEARTBEAT_INTERVAL = 20          # Seconds - router heartbeat interval
 ## Energy Model properties
 ENABLE_ENERGY_MODEL = True              # Enable energy consumption model
 INITIAL_ENERGY_JOULES = 10000           # Initial energy per node in Joules
-TX_ENERGY_PER_BYTE = 0.10            # Energy consumed per byte transmitted (J/byte)
-RX_ENERGY_PER_BYTE = 0.05           # Energy consumed per byte received (J/byte)
+TX_ENERGY_PER_BYTE = 0.0001            # Energy consumed per byte transmitted (J/byte)
+RX_ENERGY_PER_BYTE = 0.00005           # Energy consumed per byte received (J/byte)
 IDLE_ENERGY_PER_SECOND = 0.00001       # Energy consumed per second while idle (J/s)
 SLEEP_ENERGY_PER_SECOND = 0.000001     # Energy consumed per second while sleeping (J/s)
 ENABLE_PACKET_LOSS = True              # Enable packet loss simulation

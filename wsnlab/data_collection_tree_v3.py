@@ -153,6 +153,11 @@ class SensorNode(wsn.Node):
             self.packets_lost = 0
             self.bytes_sent = 0
             self.bytes_received = 0
+        
+        # Join time tracking
+        self.wakeup_time = None      # When node became UNREGISTERED
+        self.join_time = None         # When node joined network (REGISTERED/CH/ROUTER)
+        self.join_duration = None     # Time to join (join_time - wakeup_time)
 
     ###################
     def run(self):
@@ -176,6 +181,16 @@ class SensorNode(wsn.Node):
                 ROLE_COUNTS.pop(old_role, None)
         ROLE_COUNTS[new_role] += 1
         self.role = new_role
+        
+        # Track wakeup time (when node becomes UNREGISTERED)
+        if new_role == Roles.UNREGISTERED and self.wakeup_time is None:
+            self.wakeup_time = self.now
+        
+        # Track join time (when node joins network)
+        if new_role in [Roles.REGISTERED, Roles.CLUSTER_HEAD, Roles.ROUTER]:
+            if self.join_time is None and self.wakeup_time is not None:
+                self.join_time = self.now
+                self.join_duration = self.join_time - self.wakeup_time
 
         if recolor:
             if new_role == Roles.UNDISCOVERED:
@@ -1818,6 +1833,32 @@ def write_energy_summary_csv(path="energy_summary.csv"):
                 ])
 
 
+def write_join_times_csv(path="join_times.csv"):
+    """Export join time data for each node"""
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["node_id", "wakeup_time", "join_time", "join_duration", "final_role", "network_size"])
+        
+        network_size = len(sim.nodes)
+        
+        for node in sim.nodes:
+            if hasattr(node, 'wakeup_time'):
+                # Include all nodes, even if they didn't join
+                wakeup = node.wakeup_time if node.wakeup_time is not None else ''
+                join = node.join_time if node.join_time is not None else ''
+                duration = node.join_duration if node.join_duration is not None else ''
+                role = node.role.name if hasattr(node, 'role') else 'UNKNOWN'
+                
+                w.writerow([
+                    node.id,
+                    wakeup,
+                    join,
+                    duration,
+                    role,
+                    network_size
+                ])
+
+
 ###########################################################
 def create_network(node_class, number_of_nodes=100):
     """Creates given number of nodes at random positions with random arrival times.
@@ -1878,6 +1919,23 @@ def export_final_stats():
         print("Exported: child_networks_table.csv")
         print("Exported: members_table.csv")
         print("Exported: neighbors_table.csv")
+        
+        # Export join times
+        write_join_times_csv("join_times_v3.csv")
+        print("Exported: join_times_v3.csv")
+        
+        # Calculate and print join time statistics
+        join_times = [node.join_duration for node in sim.nodes 
+                     if hasattr(node, 'join_duration') and node.join_duration is not None]
+        if join_times:
+            avg_join_time = sum(join_times) / len(join_times)
+            min_join_time = min(join_times)
+            max_join_time = max(join_times)
+            print(f"\nJoin Time Statistics:")
+            print(f"  Nodes joined: {len(join_times)}/{len(sim.nodes)}")
+            print(f"  Average join time: {avg_join_time:.2f}s")
+            print(f"  Min join time: {min_join_time:.2f}s")
+            print(f"  Max join time: {max_join_time:.2f}s")
         
         # Export energy data if enabled
         if ENABLE_ENERGY_MODEL:

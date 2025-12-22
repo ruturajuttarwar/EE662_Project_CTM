@@ -2786,6 +2786,13 @@ Exporting network structure...
 Exported: child_networks_table.csv
 Exported: members_table.csv
 Exported: neighbors_table.csv
+Exported: join_times_v3.csv
+
+Join Time Statistics:
+  Nodes joined: 99/100
+  Average join time: 42.88s
+  Min join time: 30.00s
+  Max join time: 135.00s
 Exported: energy_timeline.csv
 Exported: energy_summary.csv
 

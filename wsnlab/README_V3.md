@@ -1,10 +1,61 @@
-# Data Collection Tree V3 - CTM-AdHoc Hybrid Routing Protocol
+# Data Collection Tree - Wireless Sensor Network Routing Protocols
 
 ## Overview
 
-**Data Collection Tree V3** is an advanced Wireless Sensor Network simulation implementing the **CTM-AdHoc Hybrid Routing Protocol** with automatic router layer, intelligent network maintenance, and multi-table routing decisions.
+This project implements and compares two routing protocols for Wireless Sensor Networks (WSN):
 
-### Evolution from Previous Version
+1. **data_collection_tree_CH.py** - Basic Tree Routing (Baseline)
+2. **data_collection_tree_v3.py** - CTM-AdHoc Hybrid Routing (Advanced)
+
+Both implementations include comprehensive energy models for performance comparison and analysis.
+
+---
+
+## Protocol Comparison
+
+### data_collection_tree_CH.py (Baseline)
+
+**Basic Tree Routing Protocol:**
+- Simple cluster head formation
+- Pure tree-based routing (upward/downward only)
+- Direct parent-child relationships
+- No router layer
+- Single routing method
+- Energy model enabled for comparison
+
+**Routing:**
+- Upward: Node → Parent CH → ROOT
+- Downward: ROOT → Child CH → Node
+- No mesh or multi-hop routing
+
+**Use Case:** Baseline for comparison, simpler network structure
+
+---
+
+### data_collection_tree_v3.py (Advanced - CTM-AdHoc)
+
+**CTM-AdHoc Hybrid Routing Protocol:**
+- **5 Routing Methods** - Intelligent routing decisions
+- **3-Table Routing System** - neighbors, members, child_networks
+- **Router Layer** - Automatic network expansion
+- **Network Maintenance** - Self-healing at 1000s
+- **Multi-Hop Discovery** - Extended neighbor awareness
+- **Energy Model** - Complete energy tracking
+- **Data Generation** - Application-layer traffic simulation
+- **Node Failure** - Resilience testing
+
+**Routing Methods (Priority Order):**
+1. **Direct Mesh** - Send directly to neighbors
+2. **Intra-Cluster** - Forward within cluster
+3. **Downward Tree** - Route to child clusters
+4. **Upward Tree** - Route to parent
+5. **Multi-Hop** - Use 2-hop neighbors
+
+**Use Case:** Advanced protocol with better energy efficiency and routing flexibility
+
+---
+
+## Evolution from Previous Version
 
 **Previous (data_collection_tree_CH.py):**
 - Basic cluster head formation
@@ -12,22 +63,25 @@
 - Direct join only
 - No router layer
 - Single routing method
+- Energy model (NEW - added for comparison)
 
 **V3 (data_collection_tree_v3.py) - CURRENT:**
 - **CTM-AdHoc Hybrid Routing** - 5 routing methods
 - **3-Table Routing System** - neighbors, members, child_networks
 - **Router Layer** - Boolean lock with timeout recovery
-- **Network Maintenance** - Automatic cleanup at 4000s
+- **Network Maintenance** - Automatic cleanup at 1000s
 - **Prevention Logic** - Stops invalid connections at source
 - **Enhanced Diagnostics** - Comprehensive logging
-- **Energy Model** - Complete energy consumption tracking (NEW)
-- **Packet Loss Simulation** - Realistic network conditions (NEW)
+- **Energy Model** - Complete energy consumption tracking
+- **Packet Loss Simulation** - Realistic network conditions
+- **Data Generation** - Application-layer traffic (optional)
+- **Node Failure** - Resilience testing (optional)
 
 ---
 
 ## Key Features
 
-### 1. CTM-AdHoc Hybrid Routing Protocol
+### 1. CTM-AdHoc Hybrid Routing Protocol (V3 Only)
 
 **5 Routing Methods (Priority Order):**
 
@@ -827,4 +881,250 @@ For issues or questions:
 
 ---
 
+## Comparing CH vs V3 Protocols
+
+### Running Both Simulations
+
+**1. Run Baseline (CH) Protocol:**
+```bash
+cd wsnlab
+python3 data_collection_tree_CH.py
+```
+
+**Output Files:**
+- `clusterhead_distances.csv`
+- `neighbor_distances.csv`
+- `energy_timeline_CH.csv` ← Energy data
+- `energy_summary_CH.csv` ← Energy summary
+
+**2. Run Advanced (V3) Protocol:**
+```bash
+cd wsnlab
+python3 data_collection_tree_v3.py
+```
+
+**Output Files:**
+- `child_networks_table.csv`
+- `members_table.csv`
+- `neighbors_table.csv`
+- `energy_timeline.csv` ← Energy data
+- `energy_summary.csv` ← Energy summary
+- `data_packets.csv` (if data generation enabled)
+- `data_summary.csv` (if data generation enabled)
+
+---
+
+### Comparison Metrics
+
+#### 1. Energy Efficiency
+
+**Files to Compare:**
+- `energy_timeline_CH.csv` vs `energy_timeline.csv`
+- `energy_summary_CH.csv` vs `energy_summary.csv`
+
+**Metrics:**
+```python
+# Average energy consumption
+CH_avg = mean(energy_summary_CH['total_consumed'])
+V3_avg = mean(energy_summary['total_consumed'])
+
+# Network lifetime (time until first node dies)
+CH_lifetime = min(energy_summary_CH['death_time'])
+V3_lifetime = min(energy_summary['death_time'])
+
+# Energy per packet
+CH_efficiency = CH_avg / total_packets
+V3_efficiency = V3_avg / total_packets
+```
+
+**Expected Results:**
+- V3 should have **lower average energy consumption** (mesh routing reduces hops)
+- V3 should have **longer network lifetime** (better load distribution)
+- V3 should have **better energy efficiency** (fewer retransmissions)
+
+---
+
+#### 2. Routing Efficiency
+
+**Metrics:**
+```python
+# Average hop count (from data_packets.csv in V3)
+V3_avg_hops = mean(data_packets[data_packets['event']=='DELIVERED']['hop_count'])
+
+# For CH, estimate from tree depth
+CH_avg_hops = average_tree_depth * 2  # up and down
+
+# Packet delivery ratio (V3 only with data generation)
+PDR = delivered_packets / generated_packets * 100
+```
+
+**Expected Results:**
+- V3 should have **lower average hop count** (direct mesh routing)
+- V3 should have **higher PDR** (multiple routing options)
+
+---
+
+#### 3. Network Structure
+
+**CH Protocol:**
+```
+ROOT
+  ├── CH1
+  │   ├── Node A
+  │   └── Node B
+  └── CH2
+      ├── Node C
+      └── Node D
+
+Simple tree, fixed paths
+```
+
+**V3 Protocol:**
+```
+ROOT
+  ├── CH1 ←→ CH2 (mesh)
+  │   ├── Router → CH3
+  │   ├── Node A ←→ Node B (mesh)
+  │   └── Node C
+  └── CH2
+      └── Node D
+
+Hybrid tree + mesh, flexible paths
+```
+
+---
+
+### Analysis Scripts
+
+**Python Analysis Example:**
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load energy data
+ch_timeline = pd.read_csv('energy_timeline_CH.csv')
+v3_timeline = pd.read_csv('energy_timeline.csv')
+
+# Plot average remaining energy over time
+ch_avg = ch_timeline.groupby('timestamp')['remaining_energy'].mean()
+v3_avg = v3_timeline.groupby('timestamp')['remaining_energy'].mean()
+
+plt.figure(figsize=(10, 6))
+plt.plot(ch_avg.index, ch_avg.values, label='CH Protocol (Baseline)', marker='o')
+plt.plot(v3_avg.index, v3_avg.values, label='V3 Protocol (CTM-AdHoc)', marker='s')
+plt.xlabel('Time (seconds)')
+plt.ylabel('Average Remaining Energy (Joules)')
+plt.title('Energy Consumption Comparison')
+plt.legend()
+plt.grid(True)
+plt.savefig('energy_comparison.png')
+plt.show()
+
+# Calculate improvement
+ch_final = ch_avg.iloc[-1]
+v3_final = v3_avg.iloc[-1]
+improvement = (v3_final - ch_final) / ch_final * 100
+print(f"V3 has {improvement:.2f}% more remaining energy than CH")
+```
+
+**Energy Efficiency Comparison:**
+
+```python
+# Load summary data
+ch_summary = pd.read_csv('energy_summary_CH.csv')
+v3_summary = pd.read_csv('energy_summary.csv')
+
+# Compare by role
+roles = ['ROOT', 'CLUSTER_HEAD', 'REGISTERED']
+for role in roles:
+    ch_role = ch_summary[ch_summary['final_role'] == role]['total_consumed'].mean()
+    v3_role = v3_summary[v3_summary['final_role'] == role]['total_consumed'].mean()
+    
+    print(f"{role}:")
+    print(f"  CH: {ch_role:.2f} J")
+    print(f"  V3: {v3_role:.2f} J")
+    print(f"  Improvement: {(ch_role - v3_role) / ch_role * 100:.2f}%")
+```
+
+**Network Lifetime Comparison:**
+
+```python
+# Count alive nodes over time
+ch_alive = ch_timeline.groupby('timestamp')['is_alive'].sum()
+v3_alive = v3_timeline.groupby('timestamp')['is_alive'].sum()
+
+plt.figure(figsize=(10, 6))
+plt.plot(ch_alive.index, ch_alive.values, label='CH Protocol', marker='o')
+plt.plot(v3_alive.index, v3_alive.values, label='V3 Protocol', marker='s')
+plt.xlabel('Time (seconds)')
+plt.ylabel('Number of Alive Nodes')
+plt.title('Network Lifetime Comparison')
+plt.legend()
+plt.grid(True)
+plt.savefig('lifetime_comparison.png')
+plt.show()
+```
+
+---
+
+### Expected Comparison Results
+
+| Metric | CH Protocol | V3 Protocol | Improvement |
+|--------|-------------|-------------|-------------|
+| Avg Energy Consumption | Higher | Lower | 15-25% |
+| Network Lifetime | Shorter | Longer | 20-30% |
+| Avg Hop Count | 3-4 hops | 2-3 hops | 25-35% |
+| Routing Flexibility | Low (1 path) | High (5 methods) | N/A |
+| Packet Delivery Ratio | ~85% | ~95% | +10% |
+| Network Resilience | Low | High | N/A |
+
+---
+
+### Configuration for Fair Comparison
+
+**Ensure same settings in config.py:**
+
+```python
+# Network
+SIM_NODE_COUNT = 100
+NODE_TX_RANGE = 100
+SIMULATION_DURATION = 2000
+
+# Energy Model (MUST BE SAME)
+ENABLE_ENERGY_MODEL = True
+INITIAL_ENERGY_JOULES = 10000
+TX_ENERGY_PER_BYTE = 0.10
+RX_ENERGY_PER_BYTE = 0.05
+IDLE_ENERGY_PER_SECOND = 0.00001
+SLEEP_ENERGY_PER_SECOND = 0.000001
+
+# For V3 only
+ENABLE_DATA_GENERATION = False  # Disable for fair comparison
+ENABLE_NODE_FAILURE = False     # Disable for fair comparison
+```
+
+---
+
+### Research Questions
+
+1. **Energy Efficiency:** Does hybrid routing reduce energy consumption?
+2. **Scalability:** How do protocols perform with 50, 100, 200 nodes?
+3. **Network Lifetime:** Which protocol keeps more nodes alive longer?
+4. **Traffic Load:** How does performance change with different data generation rates?
+5. **Resilience:** How do protocols handle node failures?
+
+---
+
+## Support
+
+For issues or questions:
+1. Check troubleshooting section
+2. Review log files (simulation_log.txt)
+3. Verify configuration (config.py)
+4. Check documentation files
+
+---
+
 **Happy Simulating!**
+
